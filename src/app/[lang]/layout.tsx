@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Golos_Text, Unbounded } from "next/font/google";
+import { Footer } from "@/components/layout/Footer";
 import { TopBar } from "@/components/layout/TopBar";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { hasLocale, localeMeta, locales, defaultLocale } from "@/lib/i18n/config";
 import { getSiteUrl } from "@/lib/site-url";
-import { site } from "@/lib/site";
+import { sameAs, site } from "@/lib/site";
 import "../globals.css";
 
 const display = Unbounded({
@@ -84,7 +85,8 @@ function PersonJsonLd({ lang }: { lang: keyof typeof site.name }) {
     jobTitle: "AI Solutions & Business Process Automation",
   };
   if (siteUrl) data.url = new URL(`/${lang}`, siteUrl).toString();
-  if (site.sameAs.length) data.sameAs = site.sameAs;
+  const profiles = sameAs();
+  if (profiles.length) data.sameAs = profiles;
 
   return (
     <script
@@ -107,6 +109,7 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
         <PersonJsonLd lang={lang} />
         <TopBar lang={lang} dict={dict} />
         {children}
+        <Footer lang={lang} dict={dict} />
       </body>
     </html>
   );

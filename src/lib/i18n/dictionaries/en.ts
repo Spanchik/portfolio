@@ -53,6 +53,16 @@ export const en: Dictionary = {
     text: "I build systems where data doesn't get lost between applications and routine operations run on their own. I integrate 1C, databases and external services via API, automate business processes and deploy AI agents — with access control enforced in code.",
     projectsLabel: "Projects",
   },
+  contact: {
+    title: "Let's talk about your automation",
+    text: "Tell me where your team loses time on routine work — I'll suggest what can be automated.",
+    write: "Write to me",
+    copy: "Copy address",
+    copied: "Copied",
+  },
+  footer: {
+    top: "Back to top",
+  },
   status: {
     implemented: "IMPLEMENTED",
     inProgress: "IN PROGRESS",
