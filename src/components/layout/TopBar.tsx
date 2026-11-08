@@ -10,8 +10,8 @@ export function TopBar({ lang, dict }: { lang: Locale; dict: Dictionary }) {
       <div className="mx-auto flex h-[72px] max-w-[1360px] items-center justify-between gap-4 px-4 md:px-8">
         <p className="flex min-w-0 items-center gap-3 text-[13px] font-semibold">
           {name && <span className="truncate text-fg">{name}</span>}
-          {name && <span aria-hidden className="text-line-2">/</span>}
-          <span className="truncate text-fg">{dict.meta.title}</span>
+          {name && <span aria-hidden className="hidden text-line-2 sm:inline">/</span>}
+          <span className={name ? "hidden truncate text-fg sm:inline" : "truncate text-fg"}>{dict.meta.title}</span>
         </p>
         <LangSwitch lang={lang} label={dict.topbar.langNav} />
       </div>

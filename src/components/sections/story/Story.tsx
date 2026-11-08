@@ -18,6 +18,7 @@ export function Story({ dict }: { dict: Dictionary }) {
   const trackRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
+  const flashRef = useRef<HTMLDivElement>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const railRefs = useRef<(HTMLElement | null)[]>([]);
   const reduced = usePrefersReducedMotion();
@@ -34,11 +35,12 @@ export function Story({ dict }: { dict: Dictionary }) {
     let cancelled = false;
     import("./scene")
       .then(({ createStory }) => {
-        if (cancelled || !canvasRef.current || !labelsRef.current || !trackRef.current) return;
+        if (cancelled || !canvasRef.current || !labelsRef.current || !flashRef.current || !trackRef.current) return;
         try {
           dispose = createStory({
             canvas: canvasRef.current,
             labelsEl: labelsRef.current,
+            flashEl: flashRef.current,
             track: trackRef.current,
             stepEls: stepRefs.current.filter(Boolean) as HTMLElement[],
             railEls: railRefs.current.filter(Boolean) as HTMLElement[],
@@ -57,14 +59,15 @@ export function Story({ dict }: { dict: Dictionary }) {
   }, [reduced, subsKey]);
 
   const words = dict.hero.title.split(" ");
-  const steps = dict.story.steps;
+  // prologue step ("from chaos") + the architecture walk-through
+  const steps = [dict.story.chaos, ...dict.story.steps];
 
   return (
     <section
       ref={trackRef}
       id="hero"
       aria-labelledby="hero-title"
-      className={cn("relative", fallback ? "h-dvh" : "h-[600vh]")}
+      className={cn("relative", fallback ? "h-dvh" : "h-[750vh]")}
     >
       <div className="sticky top-0 h-dvh overflow-hidden">
         {fallback ? (
@@ -77,6 +80,13 @@ export function Story({ dict }: { dict: Dictionary }) {
             <div ref={labelsRef} aria-hidden className="pointer-events-none absolute inset-0" />
           </>
         )}
+
+        {/* flash at the end of the prologue (driven by the scene) */}
+        <div
+          ref={flashRef}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_68%_52%,rgba(255,255,255,.95),rgba(255,170,110,.35)_30%,rgba(255,255,255,0)_60%)] opacity-0 mix-blend-screen"
+        />
 
         {/* readability veil under the copy */}
         <div

@@ -24,6 +24,11 @@ export const en: Dictionary = {
   story: {
     hint: "Scroll to see how it works",
     sceneLabel: "3D diagram of a typical automation architecture",
+    chaos: {
+      k: "From chaos",
+      title: "Spreadsheets, e-mails and messages — into one stream",
+      text: "Scattered documents become structured data that the system works with from then on.",
+    },
     steps: [
       { k: "Input", title: "Requests arrive from any channel", text: "Telegram, a web portal or an external service via API — everything lands in one system." },
       { k: "AI agent", title: "The agent understands what needs doing", text: "It picks the right tools, while access rights are checked by code, not by the model." },
