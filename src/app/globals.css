@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* ───────────────────────── Design tokens — direction B "Isometric machine" ───────────────────────── */
+@theme {
+  /* surfaces */
+  --color-bg: #1f3bff; /* Klein-like blue, page background */
+  --color-panel: #142ad6; /* deeper blue panels */
+  --color-panel-2: #0f22b8;
+  --color-ink: #0a0f3d; /* text on white / orange / paper */
+  --color-paper: #f4f2ec; /* light sections alternate with blue ones */
+
+  /* isometric faces */
+  --color-face-top: #2c47ff;
+  --color-face-left: #132ac4;
+  --color-face-right: #0d1f9c;
+
+  /* text & lines */
+  --color-fg: #ffffff;
+  --color-muted: #c9d0ff; /* ≥ 4.5:1 on bg */
+  --color-line: #4d63ff;
+  --color-line-2: #7a8bff;
+
+  /* accents */
+  --color-accent: #ff6a1a;
+  --color-accent-deep: #d94d00;
+  --color-ok: #3dff8a;
+  --color-warn: #ffb800;
+
+  --font-display: var(--font-unbounded), "Arial Black", sans-serif;
+  --font-sans: var(--font-golos), "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", monospace;
+}
+
+/* ───────────────────────── Boot sequence (CSS only, runs once) ───────────────────────── */
+@keyframes boot-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes boot-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes boot-word {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+@layer components {
+  .boot-fade {
+    animation: boot-fade 0.6s linear both;
+  }
+  .boot-fade-up {
+    animation: boot-fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .boot-word {
+    display: inline-block;
+    animation: boot-word 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-fg);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+  }
+}
+
+/* ───────────────────────── 3D story labels (created imperatively by CSS2DRenderer) ───────────────────────── */
+.story-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transform: translateY(-14px);
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.story-label b {
+  font: 700 10.5px var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-bg);
+  background: #fff;
+  padding: 5px 9px;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(10, 15, 61, 0.25);
+}
+.story-label span {
+  font: 500 11px var(--font-sans);
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(10, 15, 61, 0.45);
+}
+.story-label.is-hot b {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* story copy: stacked steps, cross-faded by the scene loop via opacity + --shift */
+.story-step {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  transform: translateY(var(--shift, 0px));
+  will-change: opacity, transform;
+}
+@media (min-width: 768px) {
+  .story-step {
+    top: 0;
+    bottom: auto;
+    transform: translateY(calc(-50% + var(--shift, 0px)));
+  }
+}
