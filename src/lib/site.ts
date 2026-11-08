@@ -21,7 +21,7 @@ export const site: SiteConfig = {
   name: { uk: "Ілля Соколовський", en: "Ilya Sokolovskyi" },
   contacts: {
     email: "ilyasokolovskiy64@gmail.com",
-    telegram: "",
+    telegram: "Spanch2",
     github: "https://github.com/Spanchik",
   },
   portrait: { src: "/images/portrait.jpg", file: "portrait.jpg", width: 960, height: 1200 },

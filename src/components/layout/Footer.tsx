@@ -15,6 +15,16 @@ export function Footer({ lang, dict }: { lang: Locale; dict: Dictionary }) {
           <a href={`mailto:${site.contacts.email}`} className="rounded-full px-3 py-2 text-muted hover:text-fg">
             Email
           </a>
+          {site.contacts.telegram && (
+            <a
+              href={`https://t.me/${site.contacts.telegram}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full px-3 py-2 text-muted hover:text-fg"
+            >
+              Telegram
+            </a>
+          )}
           {site.contacts.github && (
             <a href={site.contacts.github} target="_blank" rel="noopener noreferrer" className="rounded-full px-3 py-2 text-muted hover:text-fg">
               GitHub
