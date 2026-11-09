@@ -6,7 +6,7 @@ import { LangSwitch } from "./LangSwitch";
 export function TopBar({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const name = site.name[lang];
   return (
-    <header className="absolute inset-x-0 top-0 z-20">
+    <header className="absolute inset-x-0 top-0 z-20" style={{ viewTransitionName: "site-header" }}>
       <div className="mx-auto flex h-[72px] max-w-[1360px] items-center justify-between gap-4 px-4 md:px-8">
         <p className="flex min-w-0 items-center gap-3 text-[13px] font-semibold">
           {name && <span className="truncate text-fg">{name}</span>}

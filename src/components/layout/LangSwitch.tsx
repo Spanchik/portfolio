@@ -14,6 +14,9 @@ export function LangSwitch({ lang, label }: { lang: Locale; label: string }) {
             hrefLang={localeMeta[l].htmlLang}
             lang={localeMeta[l].htmlLang}
             aria-current={active ? "page" : undefined}
+            // keep the reading position and let <ViewTransition> animate the text swap
+            scroll={false}
+            transitionTypes={["lang-switch"]}
             className={cn(
               "inline-flex h-10 min-w-12 items-center justify-center rounded-full border-[1.5px] px-3",
               active ? "border-fg text-fg" : "border-transparent text-muted hover:text-fg",

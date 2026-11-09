@@ -23,6 +23,8 @@ export const en: Dictionary = {
   },
   story: {
     hint: "Scroll to see how it works",
+    breakHint: "Click a block to switch it off",
+    offline: "offline",
     sceneLabel: "3D diagram of a typical automation architecture",
     chaos: {
       k: "From chaos",

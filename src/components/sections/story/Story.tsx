@@ -19,6 +19,8 @@ export function Story({ dict }: { dict: Dictionary }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLParagraphElement>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const railRefs = useRef<(HTMLElement | null)[]>([]);
   const reduced = usePrefersReducedMotion();
@@ -29,18 +31,22 @@ export function Story({ dict }: { dict: Dictionary }) {
     tg: s.tg, web: s.web, api: s.api, rbac: s.rbac, agent: s.agent, tools: s.tools, c1: s.c1, db: s.sheets, wf: s.approval,
   };
   const subsKey = JSON.stringify(subs);
+  const offlineLabel = dict.story.offline;
 
   useEffect(() => {
     let dispose: (() => void) | undefined;
     let cancelled = false;
     import("./scene")
       .then(({ createStory }) => {
-        if (cancelled || !canvasRef.current || !labelsRef.current || !flashRef.current || !trackRef.current) return;
+        if (cancelled || !canvasRef.current || !labelsRef.current || !flashRef.current || !cursorRef.current || !hintRef.current || !trackRef.current) return;
         try {
           dispose = createStory({
             canvas: canvasRef.current,
             labelsEl: labelsRef.current,
             flashEl: flashRef.current,
+            cursorEl: cursorRef.current,
+            hintEl: hintRef.current,
+            offlineLabel,
             track: trackRef.current,
             stepEls: stepRefs.current.filter(Boolean) as HTMLElement[],
             railEls: railRefs.current.filter(Boolean) as HTMLElement[],
@@ -56,7 +62,7 @@ export function Story({ dict }: { dict: Dictionary }) {
       cancelled = true;
       dispose?.();
     };
-  }, [reduced, subsKey]);
+  }, [reduced, subsKey, offlineLabel]);
 
   const words = dict.hero.title.split(" ");
   // prologue step ("from chaos") + the architecture walk-through
@@ -87,6 +93,18 @@ export function Story({ dict }: { dict: Dictionary }) {
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_68%_52%,rgba(255,255,255,.95),rgba(255,170,110,.35)_30%,rgba(255,255,255,0)_60%)] opacity-0 mix-blend-screen"
         />
+
+        {/* "break the system" hint, faded in by the scene once the machine is assembled */}
+        {!fallback && (
+          <p
+            ref={hintRef}
+            aria-hidden
+            className="pointer-events-none absolute right-4 bottom-6 z-10 hidden items-center gap-2 rounded-full bg-ink/70 px-4 py-2 text-xs font-semibold opacity-0 backdrop-blur transition-opacity duration-300 md:right-8 md:inline-flex"
+          >
+            <span aria-hidden className="size-2 rotate-45 bg-accent" />
+            {dict.story.breakHint}
+          </p>
+        )}
 
         {/* readability veil under the copy */}
         <div
@@ -155,6 +173,12 @@ export function Story({ dict }: { dict: Dictionary }) {
           </div>
         )}
       </div>
+      {/* cursor packet (fine pointers only; positioned by the scene) */}
+      <div
+        ref={cursorRef}
+        aria-hidden
+        className="pointer-events-none fixed top-0 left-0 z-30 -mt-1.5 -ml-1.5 size-3 bg-accent opacity-0 shadow-[0_0_0_2px_#fff] transition-opacity duration-150"
+      />
     </section>
   );
 }

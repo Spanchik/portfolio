@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Golos_Text, Unbounded } from "next/font/google";
@@ -108,8 +109,13 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
       <body className="min-h-dvh bg-bg text-fg">
         <PersonJsonLd lang={lang} />
         <TopBar lang={lang} dict={dict} />
-        {children}
-        <Footer lang={lang} dict={dict} />
+        {/* language switch: content blurs out and back in (header stays anchored) */}
+        <ViewTransition update={{ "lang-switch": "lang-swap", default: "none" }} default="none">
+          <div>
+            {children}
+            <Footer lang={lang} dict={dict} />
+          </div>
+        </ViewTransition>
       </body>
     </html>
   );

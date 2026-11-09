@@ -23,6 +23,12 @@ export type StoryOptions = {
   railEls: HTMLElement[];
   subs: Record<StationKey, string>;
   reduced: boolean;
+  /** Small DOM cursor (orange diamond) shown over the scene for fine pointers. */
+  cursorEl: HTMLElement;
+  /** "Click a block to switch it off" hint, shown once the machine is assembled. */
+  hintEl: HTMLElement;
+  /** Label sub-text for a switched-off block. */
+  offlineLabel: string;
 };
 
 const ORANGE = 0xff6a1a;
@@ -59,6 +65,10 @@ type Station = (typeof RAW)[number] & {
   cz: number;
   heat: number;
   dist: number;
+  sub: HTMLElement;
+  down: boolean;
+  downK: number;
+  lift: number;
 };
 type Shot = { pos: THREE.Vector3; target: THREE.Vector3 };
 type Step = { cam: Shot; hot: StationKey[]; flows: string[] };
@@ -230,7 +240,7 @@ export function createStory(o: StoryOptions): () => void {
     const label = new CSS2DObject(el);
     label.position.set(cx, r.h + (r.id === "agent" ? 1.75 : 0.35), cz);
     scene.add(label);
-    S[r.id] = { ...r, pivot, mesh, mat, edges, el, cx, cz, heat: 0, dist: 0 };
+    S[r.id] = { ...r, pivot, mesh, mat, edges, el, cx, cz, heat: 0, dist: 0, sub: s, down: false, downK: 0, lift: 0 };
   }
   const agent = S.agent;
   for (const s of Object.values(S)) s.dist = Math.hypot(s.cx - agent.cx, s.cz - agent.cz);
@@ -282,7 +292,7 @@ export function createStory(o: StoryOptions): () => void {
   const packets: { m: THREE.Mesh; c: (typeof curves)[string]; t: number; speed: number; to: StationKey }[] = [];
   const launch = (key: string) => {
     const c = curves[key];
-    if (!c) return;
+    if (!c || S[key.split("-")[0] as StationKey].down) return;
     const m = new THREE.Mesh(cubeGeo, cubeMat);
     m.castShadow = true;
     scene.add(m);
@@ -399,6 +409,65 @@ export function createStory(o: StoryOptions): () => void {
   const mouse = new THREE.Vector2();
   const onPointer = (e: PointerEvent) => mouse.set(e.clientX / window.innerWidth - 0.5, e.clientY / window.innerHeight - 0.5);
 
+  // ── interaction: hover / click blocks ("break the system") + cursor packet
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  const meshToId = new Map<THREE.Object3D, StationKey>(Object.values(S).map((st) => [st.mesh, st.id]));
+  const ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.3);
+  const finePointer = window.matchMedia("(pointer: fine)").matches;
+  const WHITE = new THREE.Color(0xf7f8ff);
+  const DOWN = new THREE.Color(0x8c96c8);
+  let interactive = false;
+  let hovered: StationKey | null = null;
+  let overCanvas = false;
+  const pointerPos = new THREE.Vector3();
+  const flyers: { m: THREE.Mesh; from: THREE.Vector3; ctrl: THREE.Vector3; to: THREE.Vector3; t: number; id: StationKey }[] = [];
+
+  const pick = (e: { clientX: number; clientY: number }): StationKey | null => {
+    const r = o.canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    raycaster.setFromCamera(ndc, camera);
+    raycaster.ray.intersectPlane(ground, pointerPos);
+    const hit = raycaster.intersectObjects([...meshToId.keys()], false)[0];
+    return hit ? (meshToId.get(hit.object) ?? null) : null;
+  };
+  const flyTo = (id: StationKey) => {
+    if (o.reduced || S[id].down) return;
+    const st = S[id];
+    const to = new THREE.Vector3(st.cx, st.h + 0.3, st.cz);
+    const from = pointerPos.clone();
+    const ctrl = from.clone().lerp(to, 0.5).add(new THREE.Vector3(0, 3, 0));
+    const m = new THREE.Mesh(cubeGeo, cubeMat);
+    m.castShadow = true;
+    scene.add(m);
+    flyers.push({ m, from, ctrl, to, t: 0, id });
+  };
+  const onCanvasMove = (e: PointerEvent) => {
+    overCanvas = true;
+    o.cursorEl.style.transform = "translate(" + e.clientX + "px, " + e.clientY + "px) rotate(45deg)";
+    if (!interactive) return;
+    const id = pick(e);
+    if (id !== hovered && id && e.pointerType === "mouse") flyTo(id);
+    hovered = id;
+    o.canvas.style.cursor = id ? "pointer" : finePointer ? "none" : "";
+  };
+  const onCanvasLeave = () => {
+    overCanvas = false;
+    hovered = null;
+  };
+  const onCanvasClick = (e: MouseEvent) => {
+    if (!interactive) return;
+    const id = pick(e);
+    if (!id) return;
+    const st = S[id];
+    st.down = !st.down;
+    st.sub.textContent = st.down ? o.offlineLabel : o.subs[id];
+    st.el.classList.toggle("is-down", st.down);
+  };
+  o.canvas.addEventListener("pointermove", onCanvasMove);
+  o.canvas.addEventListener("pointerleave", onCanvasLeave);
+  o.canvas.addEventListener("click", onCanvasClick);
+
   // only render while the story is on screen
   let visible = true;
   const io = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting), { threshold: 0 });
@@ -467,6 +536,10 @@ export function createStory(o: StoryOptions): () => void {
 
     // agent core: spin-up, flash, shockwave
     const cur = Math.round(progress);
+    interactive = build > 0.98;
+    o.hintEl.style.opacity = interactive && progress > 0.98 && progress < STEPS.length - 1.02 ? "1" : "0";
+    o.cursorEl.style.opacity = interactive && overCanvas && finePointer && !hovered ? "1" : "0";
+    if (!interactive && o.canvas.style.cursor) o.canvas.style.cursor = "";
     const spinUp = o.reduced ? 0 : 0.8 + bell(pro, 0.55, 0.25) * 14;
     ring.rotation.z += dt * (cur === 3 && !o.reduced ? 2.4 : spinUp);
     ring2.rotation.z -= dt * spinUp * 0.6;
@@ -484,6 +557,10 @@ export function createStory(o: StoryOptions): () => void {
     for (const s of Object.values(S)) {
       const k = o.reduced ? 1 : ease(clamp01((build - s.dist * 0.035) / 0.5));
       s.pivot.scale.set(1, Math.max(0.001, k), 1);
+      s.downK += ((s.down ? 1 : 0) - s.downK) * Math.min(1, dt * 8);
+      s.lift += ((hovered === s.id && !s.down ? 0.28 : 0) - s.lift) * Math.min(1, dt * 12);
+      s.pivot.position.y = s.lift - s.downK * 0.12;
+      s.mat.color.lerpColors(WHITE, DOWN, s.downK);
       s.pivot.visible = k > 0.002;
       s.mesh.castShadow = k > 0.3;
       (s.edges.material as THREE.LineBasicMaterial).opacity = (0.9 - k * 0.8) * intro;
@@ -520,7 +597,7 @@ export function createStory(o: StoryOptions): () => void {
       const s = S[id];
       const want = hot.has(id) ? 1 : 0;
       s.heat += (want - s.heat) * Math.min(1, dt * 6);
-      s.mat.emissiveIntensity = s.heat * 0.22;
+      s.mat.emissiveIntensity = s.down ? 0 : s.heat * 0.22;
       s.el.classList.toggle("is-hot", want === 1);
     }
 
@@ -530,9 +607,19 @@ export function createStory(o: StoryOptions): () => void {
       const flows = STEPS[cur].flows;
       launch(flows[flowIdx++ % flows.length]);
     }
+    const queued: Partial<Record<StationKey, number>> = {};
     for (let i = packets.length - 1; i >= 0; i--) {
       const p = packets[i];
       p.t += p.speed * dt;
+      if (S[p.to].down) {
+        // destination is offline: wait in a queue in front of it and "retry"
+        const idx = (queued[p.to] = (queued[p.to] ?? -1) + 1);
+        const hold = Math.max(0.2, 0.86 - idx * (0.6 / p.c.len));
+        if (p.t > hold) p.t = hold;
+        const pt = p.c.path.getPointAt(p.t);
+        p.m.position.set(pt.x, 0.3 + Math.abs(Math.sin(now / 180 + i)) * 0.25, pt.z);
+        continue;
+      }
       if (p.t >= 1) {
         scene.remove(p.m);
         packets.splice(i, 1);
@@ -542,6 +629,23 @@ export function createStory(o: StoryOptions): () => void {
       const pt = p.c.path.getPointAt(p.t);
       p.m.position.set(pt.x, 0.3, pt.z);
       p.m.rotation.y += dt * 3;
+    }
+
+    for (let i = flyers.length - 1; i >= 0; i--) {
+      const f = flyers[i];
+      f.t += dt / 0.55;
+      if (f.t >= 1) {
+        scene.remove(f.m);
+        flyers.splice(i, 1);
+        S[f.id].heat = Math.max(S[f.id].heat, 1);
+        continue;
+      }
+      const u = f.t;
+      const a = (1 - u) * (1 - u);
+      const b = 2 * (1 - u) * u;
+      const c = u * u;
+      f.m.position.set(a * f.from.x + b * f.ctrl.x + c * f.to.x, a * f.from.y + b * f.ctrl.y + c * f.to.y, a * f.from.z + b * f.ctrl.z + c * f.to.z);
+      f.m.rotation.y += dt * 6;
     }
 
     renderer.render(scene, camera);
@@ -555,7 +659,13 @@ export function createStory(o: StoryOptions): () => void {
     window.removeEventListener("scroll", readScroll);
     window.removeEventListener("resize", resize);
     window.removeEventListener("pointermove", onPointer);
+    o.canvas.removeEventListener("pointermove", onCanvasMove);
+    o.canvas.removeEventListener("pointerleave", onCanvasLeave);
+    o.canvas.removeEventListener("click", onCanvasClick);
+    o.canvas.style.cursor = "";
     o.flashEl.style.opacity = "0";
+    o.hintEl.style.opacity = "0";
+    o.cursorEl.style.opacity = "0";
     const geos = new Set<THREE.BufferGeometry>();
     const mats = new Set<THREE.Material>();
     scene.traverse((obj) => {
