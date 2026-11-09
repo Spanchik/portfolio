@@ -176,7 +176,9 @@ const OBJECT_ORDER = ["folder", "sheet", "chat", "envelope", "clipboard", "sheet
 /** Returns a disposer. Throws if WebGL is unavailable (caller shows a fallback). */
 export function createStory(o: StoryOptions): () => void {
   const renderer = new THREE.WebGLRenderer({ canvas: o.canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // phones: cheaper frame (lower DPR, smaller shadow map, fewer chaos objects)
+  const lite = window.matchMedia("(max-width: 820px)").matches;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, lite ? 1.5 : 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -192,7 +194,7 @@ export function createStory(o: StoryOptions): () => void {
   const sun = new THREE.DirectionalLight(0xffffff, 2.1);
   sun.position.set(10, 22, 12);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.set(lite ? 1024 : 2048, lite ? 1024 : 2048);
   Object.assign(sun.shadow.camera, { left: -20, right: 20, top: 20, bottom: -20, near: 1, far: 70 });
   sun.shadow.bias = -0.0004;
   sun.shadow.radius = 6;
@@ -307,7 +309,7 @@ export function createStory(o: StoryOptions): () => void {
   const objs: Obj[] = [];
   if (!o.reduced) {
     const makers = buildMakers();
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < (lite ? 14 : 24); i++) {
       const m = makers[OBJECT_ORDER[i % OBJECT_ORDER.length]]();
       scene.add(m);
       const cube = new THREE.Mesh(cubeGeo, cubeMat);

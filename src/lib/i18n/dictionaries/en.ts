@@ -1,3 +1,4 @@
+import { casesEn } from "./cases.en";
 import type { Dictionary } from "./uk";
 
 export const en: Dictionary = {
@@ -7,19 +8,13 @@ export const en: Dictionary = {
       "1C, database and API integrations, business process automation and AI agents.",
   },
   topbar: {
-    role: "AI Solutions · Automation",
     langNav: "Site language",
   },
   hero: {
-    eyebrow: "// AI SOLUTIONS & BUSINESS PROCESS AUTOMATION",
     title: "AI solutions and business process automation.",
     subtitle: "I connect 1C, databases and APIs into a single system — and hand the routine over to AI agents.",
-    cta: "Get in touch",
-    how: "How it works",
     portraitAlt: "Developer portrait",
     titleAccent: "automation",
-    about: "About me",
-    projectsLabel: "Projects",
   },
   story: {
     hint: "Scroll to see how it works",
@@ -58,8 +53,8 @@ export const en: Dictionary = {
   about: {
     title: "About me",
     text: "I build systems where data doesn't get lost between applications and routine operations run on their own. I integrate 1C, databases and external services via API, automate business processes and deploy AI agents — with access control enforced in code.",
-    projectsLabel: "Projects",
   },
+  cases: casesEn,
   contact: {
     title: "Let's talk about your automation",
     text: "Tell me where your team loses time on routine work — I'll suggest what can be automated.",
@@ -69,70 +64,5 @@ export const en: Dictionary = {
   },
   footer: {
     top: "Back to top",
-  },
-  status: {
-    implemented: "IMPLEMENTED",
-    inProgress: "IN PROGRESS",
-    inDevelopment: "IN DEVELOPMENT",
-    planned: "PLANNED",
-  },
-  hrPlatform: {
-    id: "HR_PLATFORM",
-    caption: "HR ecosystem",
-    rows: {
-      recruitment: "Recruitment & HR processes",
-      integration1c: "1C integration (1C HTTP service configured)",
-      analytics: "Management analytics & reports",
-      lms: "LMS integration",
-    },
-  },
-  hrAssistant: {
-    id: "HR_ASSISTANT",
-    caption: "AI HR Automation",
-    description:
-      "AI HR Assistant — an intelligent assistant for HR process automation. Telegram bot, web administration panel, AI agent, employee data, document workflows and configurable approval routing.",
-    roles: "Available functions depend on the role: employee, manager, HR.",
-  },
-  how: {
-    index: "01",
-    title: "How it works",
-    lead: "Project architecture as built. Events on the map are a synthetic demo.",
-    tickerLabel: "Demo event stream",
-  },
-  console: {
-    mapTitle: "system-map",
-    mapLabel: "Project architecture map",
-    follow: "Follow the stream",
-    inspectorTitle: "inspector",
-    overview: "Project overview",
-    nodeHint: "Hover or select a node on the map",
-    closeNode: "Back to overview",
-    legend: { solid: "working", progress: "in progress", planned: "planned" },
-  },
-  nodes: {
-    tg: "Primary interface for employees, managers and HR. Calls the agent directly, in-process.",
-    web: "Admin panel (Flask): requests, managers & routes, document templates, users, AI costs, action log.",
-    api: "The web panel reaches the agent through it. Agent code is shared with the bot.",
-    rbac: "Role is resolved before the agent runs; the tool set is filtered by role in Python code.",
-    agent: "Claude via Anthropic SDK. Chooses tools itself (tool calling); business operations run in Python code.",
-    tools: "Self-service, manager and HR tools: salary, payslips, vacations, staffing, turnover, Excel reports.",
-    utp: "HR and payroll data. Read-only (MS SQL).",
-    bas: "Shift data. Read-only.",
-    sheets: "Staffing, vacancies, vacation journal.",
-    approval: "Employee → department head; head → designated approver. One approver per request, self-approval protection, escalation to HR.",
-    sqlite: "Requests, audit, AI usage, managers and approvers.",
-    recruit: "Candidate recruitment — implemented platform functionality.",
-    hrproc: "Implemented HR processes of the platform, including onboarding.",
-    core: "An evolving HR ecosystem.",
-    c1: "HTTP service on the 1C side is configured; integration with the platform is in progress.",
-    analytics: "Management analytics and reports — in development.",
-    lms: "LMS integration — the planned next stage.",
-  },
-  logs: {
-    title: "demo-pipeline.log",
-    badge: "DEMO ENVIRONMENT",
-    note: "Synthetic replay of project logic. Not connected to real systems; all data is DEMO-prefixed.",
-    regionLabel: "Demo event log",
-    pause: "Pause demo stream",
   },
 };

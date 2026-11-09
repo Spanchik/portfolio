@@ -68,7 +68,9 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
         "x-default": `/${defaultLocale}`,
       },
     };
-    metadata.openGraph = { ...metadata.openGraph, url: `/${lang}` };
+    const image = { url: `/${lang}/og.png`, width: 1200, height: 630, alt: dict.meta.title };
+    metadata.openGraph = { ...metadata.openGraph, url: `/${lang}`, images: [image] };
+    metadata.twitter = { card: "summary_large_image", title: dict.meta.title, description: dict.meta.description, images: [image.url] };
   }
 
   return metadata;

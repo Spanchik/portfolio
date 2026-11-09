@@ -1,0 +1,93 @@
+import type { CasesDict } from "./cases.uk";
+
+export const casesEn: CasesDict = {
+  eyebrow: "Case",
+  more: "Details",
+  less: "Collapse",
+  labels: { task: "Challenge", solution: "Solution", result: "Result", stack: "Stack" },
+  mock: {
+    chat: {
+      label: "Demo of a conversation with the HR bot (fictional data)",
+      title: "HR Assistant",
+      status: "bot · online",
+      input: "Message",
+      messages: [
+        { from: "user", text: "How many vacation days do I have left?" },
+        { from: "bot", text: "Balance: 14 days. Shall I file a request?" },
+        { from: "user", text: "Yes, May 12 to 18" },
+        { from: "bot", text: "Request #204 created and sent to your manager for approval." },
+      ],
+      approved: "Approved · document generated",
+      quick: ["File request", "Later"],
+      payslip: {
+        title: "Payslip",
+        period: "April",
+        rows: [
+          { label: "Accrued", value: "42,500" },
+          { label: "Deducted", value: "8,287" },
+          { label: "Net pay", value: "34,213" },
+        ],
+      },
+      balance: { title: "Vacation", value: "14", of: "of 24 days" },
+      approval: { title: "Request #204", meta: "Vacation · May 12–18", approve: "Approve", reject: "Reject", done: "Approved" },
+      report: { title: "Excel report", file: "headcount.xlsx" },
+    },
+    board: {
+      label: "Demo of the candidate pipeline (fictional data)",
+      url: "hr-platform / recruiting",
+      columns: ["New", "Interview", "Offer", "Hired"],
+      cards: [
+        { name: "Olena K.", role: "Accountant" },
+        { name: "Andrii M.", role: "Logistics" },
+        { name: "Iryna S.", role: "HR manager" },
+        { name: "Maksym D.", role: "Sales" },
+        { name: "Sofiia L.", role: "Analyst" },
+      ],
+      synced: "→ 1C",
+      nav: ["Recruiting", "Onboarding", "Analytics", "Learning", "1C sync"],
+      kpis: [
+        { label: "Vacancies", value: "12" },
+        { label: "Candidates", value: "48" },
+        { label: "Time-to-hire", value: "18 d" },
+      ],
+      chart: "Hires by month",
+      toast: "1C · employee created",
+      lms: { title: "Onboarding", progress: "3 of 5 steps" },
+    },
+  },
+  items: [
+    {
+      id: "assistant",
+      name: "HR Assistant",
+      title: "AI assistant for HR processes",
+      lead: "A multichannel AI agent (Telegram + Web) that handles the company's routine HR requests in self-service mode.",
+      task: "Take repetitive requests off HR and accounting: salary statements, vacation balances, HR documents and approvals scattered across messengers.",
+      solution: [
+        { b: "LLM agent with tool calling", t: "on Claude: 25+ tools; the agent detects intent and calls the right action with data from 1C." },
+        { b: "Code-level RBAC:", t: "employee / manager / HR roles, tool filtering and a second access check before every call." },
+        { b: "Approval workflow:", t: "configurable routes, self-approval protection, automatic re-routing and escalation, overdue request tracking." },
+        { b: "Document generation", t: "from .docx templates with versioning and validation." },
+        { b: "Admin panel:", t: "roles, routes, templates, audit log, LLM cost monitoring with budget alerts." },
+        { b: "Integrations:", t: "1C (UTP) and BAS Retail via MS SQL, Google Sheets, SQLite; deployed with Docker." },
+      ],
+      result: "HR requests are handled 24/7 with no human in the loop, requests are approved automatically, and HR gets Excel reports in seconds.",
+      stack: ["Python", "Claude API", "Tool Calling", "python-telegram-bot", "Flask", "MS SQL", "Google Sheets API", "SQLite", "Docker"],
+    },
+    {
+      id: "platform",
+      name: "HR Platform",
+      title: "HR ecosystem integrated with 1C",
+      lead: "A single platform for recruiting, HR processes and management analytics, synchronised with 1C.",
+      task: "Bring recruiting, onboarding and HR records into one system and remove double data entry between HR tools and 1C.",
+      solution: [
+        { b: "ATS module:", t: "candidate pipeline, statuses, onboarding of new hires." },
+        { b: "1C integration via HTTP service:", t: "automatic creation of individuals and employees, HR data sync." },
+        { b: "Management analytics:", t: "dashboards and reports on headcount, turnover and vacancies." },
+        { b: "LMS integration:", t: "training and onboarding in a single loop." },
+        { b: "Background jobs & notifications:", t: "Celery + Redis, a Telegram bot for alerts." },
+      ],
+      result: "One entry point for HR; data flows between the platform and 1C with no manual transfer.",
+      stack: ["Python", "Django", "PostgreSQL", "Celery", "Redis", "REST API", "1C HTTP service", "Telegram Bot", "Docker", "Nginx"],
+    },
+  ],
+};
