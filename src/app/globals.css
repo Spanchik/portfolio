@@ -16,7 +16,7 @@
 
   /* text & lines */
   --color-fg: #ffffff;
-  --color-muted: #c9d0ff; /* ≥ 4.5:1 on bg */
+  --color-muted: #d4daff; /* 4.9:1 on bg */
   --color-line: #4d63ff;
   --color-line-2: #7a8bff;
 

@@ -54,7 +54,7 @@ export function PipelineBoard({ dict }: { dict: Board }) {
 
           <div className="flex">
             {/* sidebar */}
-            <ul className="hidden w-11 shrink-0 flex-col gap-1 border-r-[1.5px] border-ink bg-paper p-1.5 min-[420px]:flex sm:w-40 sm:p-2">
+            <ul className="hidden w-11 shrink-0 flex-col gap-1 border-r-[1.5px] border-ink bg-paper p-1.5 min-[420px]:flex sm:w-40 sm:p-2 lg:w-11 lg:p-1.5 xl:w-40 xl:p-2">
               {dict.nav.map((n, i) => {
                 const Icon = NAV_ICONS[i];
                 return (
@@ -66,13 +66,13 @@ export function PipelineBoard({ dict }: { dict: Board }) {
                     )}
                   >
                     <Icon size={14} strokeWidth={2.2} className="shrink-0" />
-                    <span className="hidden truncate sm:inline">{n}</span>
+                    <span className="hidden truncate sm:inline lg:hidden xl:inline">{n}</span>
                   </li>
                 );
               })}
             </ul>
 
-            <div className="flex min-w-0 flex-1 flex-col gap-3 p-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-3 p-3 sm:pb-14">
               {/* KPIs */}
               <div className="grid grid-cols-3 gap-2">
                 {dict.kpis.map((k, i) => (
@@ -87,8 +87,8 @@ export function PipelineBoard({ dict }: { dict: Board }) {
               <LayoutGroup>
                 <div className="grid min-h-[230px] grid-cols-4 gap-1.5">
                   {dict.columns.map((title, c) => (
-                    <div key={title} className="flex min-w-0 flex-col gap-1.5 rounded-xl bg-paper p-1.5">
-                      <p className="flex items-center justify-between gap-1 px-0.5 font-display text-[9px] font-bold uppercase sm:text-[11px] sm:tracking-[0.04em]">
+                    <div key={title} className="flex min-w-0 flex-col gap-1.5 rounded-xl bg-paper p-1 sm:p-1.5">
+                      <p className="flex items-center justify-between gap-1 px-0.5 font-display text-[8.5px] font-bold uppercase sm:text-[11px] sm:tracking-[0.04em] lg:text-[10px] lg:tracking-normal xl:text-[11px] xl:tracking-[0.04em]">
                         <span className="truncate">{title}</span>
                         <span className="hidden text-ink/45 sm:inline">{cols.filter((x) => x === c).length}</span>
                       </p>
@@ -101,7 +101,7 @@ export function PipelineBoard({ dict }: { dict: Board }) {
                             className="flex flex-col gap-1 rounded-lg border-[1.5px] border-ink bg-white p-1.5"
                           >
                             <span className="flex items-center gap-1">
-                              <span className="hidden size-5 shrink-0 items-center justify-center rounded-full bg-bg text-[10px] font-bold text-fg sm:flex">
+                              <span className="hidden size-5 shrink-0 items-center justify-center rounded-full bg-bg text-[10px] font-bold text-fg sm:flex lg:hidden xl:flex">
                                 {initials(card.name)}
                               </span>
                               <b className="truncate text-xs">

@@ -97,7 +97,7 @@ export function PhoneChat({ dict }: { dict: Chat }) {
               <motion.span
                 initial={reduced ? false : { opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center gap-1.5 self-center rounded-full border-[1.5px] border-ink bg-accent px-3 py-1.5 text-[12.5px] font-semibold"
+                className="flex items-center gap-1.5 self-center rounded-full border-[1.5px] border-ink bg-accent px-2.5 py-1.5 text-[12px] font-semibold whitespace-nowrap"
               >
                 <Check size={13} strokeWidth={3} />
                 {dict.approved}
