@@ -121,6 +121,10 @@
   background: var(--color-accent);
 }
 @media (max-width: 820px) {
+  /* phones: block names only, the second line would crowd seven blocks */
+  .story-label span {
+    display: none;
+  }
   .story-bubble {
     max-width: 150px;
     font-size: 11px;

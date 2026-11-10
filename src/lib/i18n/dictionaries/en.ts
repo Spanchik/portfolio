@@ -15,7 +15,7 @@ export const en: Dictionary = {
     contact: "Discuss a task",
   },
   hero: {
-    title: "I build websites and systems that work for you.",
+    title: "I build websites and systems that work for\u00a0you.",
     subtitle: "I develop websites, internal systems and AI agents and connect them to your data: accounting, databases, external services.",
     portraitAlt: "Developer portrait",
     titleAccent: "work",

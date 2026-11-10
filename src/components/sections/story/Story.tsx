@@ -57,7 +57,7 @@ function StoryChat({ chat, stage, reduced }: { chat: Chat; stage: number; reduce
 
 /**
  * Hero + scroll story. A pinned 3D scene (three.js, lazy-loaded) is driven by scroll:
- * the prologue assembles a four-block machine, then one real request is followed through
+ * the prologue assembles the machine, then one real request is followed through
  * it. On the left a chat shows the conversation; each message lights up its block on the
  * right. Without WebGL the SVG isometric machine is shown and only the hero is rendered.
  */
@@ -76,7 +76,7 @@ export function Story({ dict }: { dict: Dictionary }) {
   const [stage, setStage] = useState(0);
 
   const s = dict.machine.subs;
-  const subs: Record<StationKey, string> = { tg: s.tg, agent: s.agent, c1: s.c1, wf: s.approval };
+  const subs: Record<StationKey, string> = { tg: s.tg, web: s.web, rbac: s.rbac, agent: s.agent, c1: s.c1, db: s.sheets, wf: s.approval };
   const subsKey = JSON.stringify(subs);
   const tagsKey = JSON.stringify(dict.story.tags);
   const offlineLabel = dict.story.offline;
@@ -165,7 +165,7 @@ export function Story({ dict }: { dict: Dictionary }) {
           className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(31,59,255,.96)_0%,rgba(31,59,255,.85)_42%,rgba(31,59,255,0)_62%)] md:bg-[linear-gradient(90deg,rgba(31,59,255,.92)_0%,rgba(31,59,255,.75)_30%,rgba(31,59,255,0)_52%)]"
         />
 
-        <div className="pointer-events-none absolute inset-x-4 bottom-[5vh] md:inset-x-auto md:bottom-auto md:left-8 md:top-[calc(50%+1.75rem)] md:w-[min(560px,42vw)] lg:left-[max(2rem,calc((100vw-1360px)/2+2rem))]">
+        <div className="pointer-events-none absolute inset-x-4 bottom-[5vh] md:inset-x-auto md:bottom-auto md:left-8 md:top-[calc(50%+1.75rem)] md:w-[min(720px,46vw)] lg:left-[max(2rem,calc((100vw-1360px)/2+2rem))]">
           {/* step 0 — hero copy */}
           <div
             ref={(el) => {
@@ -174,7 +174,7 @@ export function Story({ dict }: { dict: Dictionary }) {
             className="story-step"
             style={{ opacity: 1 }}
           >
-            <h1 id="hero-title" className="font-display text-[clamp(2.3rem,4.6vw,4.9rem)] leading-[1.05] font-bold tracking-[-0.02em]">
+            <h1 id="hero-title" className="font-display text-[clamp(2.2rem,3.9vw,4.4rem)] leading-[1.08] font-bold tracking-[-0.02em] text-balance">
               {words.map((w, i) => (
                 <span key={i}>
                   {bare(w) === dict.hero.titleAccent ? <em className="bg-fg px-[0.12em] text-bg not-italic">{w}</em> : w}
@@ -182,7 +182,7 @@ export function Story({ dict }: { dict: Dictionary }) {
                 </span>
               ))}
             </h1>
-            <p className="mt-6 max-w-[36ch] text-base leading-relaxed text-fg/90 md:text-lg">{dict.hero.subtitle}</p>
+            <p className="mt-6 max-w-[46ch] text-base leading-relaxed text-fg/90 md:text-lg">{dict.hero.subtitle}</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a href="#contact" className={primary}>
                 {dict.hero.ctaPrimary}
@@ -214,7 +214,7 @@ export function Story({ dict }: { dict: Dictionary }) {
               style={{ opacity: 0 }}
             >
               {/* captions share one grid cell, so the chat below never jumps */}
-              <div className="mb-4 grid md:mb-6">
+              <div className="mb-4 grid max-w-[560px] md:mb-6">
                 {stages.map((st, i) => {
                   const on = i + 1 === shown;
                   return (

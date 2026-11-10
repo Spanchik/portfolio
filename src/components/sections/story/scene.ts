@@ -12,7 +12,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { CSS2DObject, CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
-export type StationKey = "tg" | "agent" | "c1" | "wf";
+export type StationKey = "tg" | "web" | "rbac" | "agent" | "c1" | "db" | "wf";
 
 export type StoryOptions = {
   canvas: HTMLCanvasElement;
@@ -38,18 +38,22 @@ export type StoryOptions = {
 const ORANGE = 0xff6a1a;
 
 const RAW: { id: StationKey; x: number; z: number; w: number; d: number; h: number; tag: string }[] = [
-  { id: "tg", x: 0, z: 3.6, w: 2.2, d: 2.2, h: 1.1, tag: "Telegram" },
-  { id: "agent", x: 5, z: 3.1, w: 3.2, d: 3.2, h: 2.6, tag: "AI agent" },
-  { id: "c1", x: 11.4, z: 0.4, w: 2.4, d: 2.4, h: 2.2, tag: "1C" },
-  { id: "wf", x: 11.4, z: 6.6, w: 2.4, d: 2.4, h: 1.1, tag: "Workflow" },
+  { id: "tg", x: 0, z: 1.2, w: 2.2, d: 2.2, h: 1.1, tag: "Telegram" },
+  { id: "web", x: 0, z: 5.6, w: 2.2, d: 2.2, h: 1.1, tag: "Web app" },
+  { id: "rbac", x: 5.5, z: -2.4, w: 2.2, d: 1.6, h: 1.2, tag: "Access" },
+  { id: "agent", x: 5, z: 2.3, w: 3.2, d: 3.2, h: 2.6, tag: "AI agent" },
+  { id: "c1", x: 11.4, z: -0.6, w: 2.4, d: 2.4, h: 2.2, tag: "1C" },
+  { id: "db", x: 11.3, z: 2.8, w: 2.6, d: 2.2, h: 0.6, tag: "Database" },
+  { id: "wf", x: 11.4, z: 6.8, w: 2.4, d: 2.4, h: 1.1, tag: "Workflow" },
 ];
 
 const ROUTES: [StationKey, StationKey][] = [
-  ["tg", "agent"], ["agent", "c1"], ["agent", "wf"],
+  ["tg", "agent"], ["web", "agent"], ["rbac", "agent"],
+  ["agent", "c1"], ["agent", "db"], ["agent", "wf"],
 ];
 
 const CX = 6.9;
-const CZ = 4.7;
+const CZ = 3.9;
 /** Scroll share per step transition: the prologue gets one screen, the rest 0.6 each. */
 export const SEGMENTS = [1, 0.6, 0.6, 0.6];
 /** Share of the track used by the transitions; the remainder holds the last step on screen. */
@@ -73,7 +77,7 @@ type Station = (typeof RAW)[number] & {
 type Shot = { pos: THREE.Vector3; target: THREE.Vector3 };
 type Step = { cam: Shot; hot: StationKey[]; flows: string[] };
 
-const ALL_FLOWS = ["tg-agent", "agent-c1", "agent-wf"];
+const ALL_FLOWS = ["tg-agent", "rbac-agent", "agent-c1", "web-agent", "agent-db", "agent-wf"];
 
 const ease = (x: number) => x * x * (3 - 2 * x);
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -240,13 +244,25 @@ export function createStory(o: StoryOptions): () => void {
     s.textContent = o.subs[r.id];
     el.append(b, s);
     const label = new CSS2DObject(el);
-    label.position.set(cx, r.h + (r.id === "agent" ? 1.75 : 0.35), cz);
+    // labels sit above the toy prop that stands on each block (above the ring for the agent)
+    label.position.set(cx, r.h + (r.id === "agent" ? 1.75 : 1.95), cz);
     scene.add(label);
     S[r.id] = { ...r, pivot, mesh, mat, edges, el, cx, cz, heat: 0, dist: 0, sub: s, down: false, downK: 0, lift: 0 };
   }
   const agent = S.agent;
   for (const s of Object.values(S)) s.dist = Math.hypot(s.cx - agent.cx, s.cz - agent.cz);
   const MOUTH = new THREE.Vector3(agent.cx, agent.h + 0.9, agent.cz);
+
+  // ── toy props: the "routine" objects of the prologue end up sorted onto the blocks they belong to
+  const PROPS: Partial<Record<StationKey, string>> = { tg: "chat", web: "sheet", rbac: "sticky", c1: "folder", db: "stack", wf: "clipboard" };
+  const propMakers = buildMakers();
+  const props: { m: THREE.Group; s: Station; k: number; phase: number }[] = [];
+  for (const [id, kind] of Object.entries(PROPS) as [StationKey, string][]) {
+    const m = propMakers[kind]();
+    m.visible = false;
+    scene.add(m);
+    props.push({ m, s: S[id], k: 0, phase: Math.random() * 6 });
+  }
 
   // ── agent core: rings, burst light, floor shockwave
   const ring = new THREE.Mesh(
@@ -318,7 +334,7 @@ export function createStory(o: StoryOptions): () => void {
     el.textContent = text;
     el.style.opacity = "0";
     const obj = new CSS2DObject(el);
-    obj.position.set(S[id].cx, S[id].h + (id === "agent" ? 3.4 : 2.1), S[id].cz);
+    obj.position.set(S[id].cx, S[id].h + (id === "agent" ? 3.4 : 3.5), S[id].cz);
     scene.add(obj);
     return { t, id, el };
   };
@@ -327,12 +343,12 @@ export function createStory(o: StoryOptions): () => void {
     1: { len: 2.4, moves: [mkMove(0.1, 1.2, "tg-agent")], says: [] },
     // 2 — the role is checked in code, the balance is fetched from 1C and comes back
     2: {
-      len: 3.4,
-      moves: [mkMove(0.2, 1.0, "agent-c1"), mkMove(1.6, 1.0, "agent-c1", true)],
-      says: [mkSay(0, "agent", o.tags.role, "sys"), mkSay(0.6, "c1", o.tags.balance, "sys")],
+      len: 4.4,
+      moves: [mkMove(0.1, 0.8, "rbac-agent"), mkMove(1.0, 1.1, "agent-c1"), mkMove(2.6, 1.1, "agent-c1", true)],
+      says: [mkSay(0, "rbac", o.tags.role, "sys"), mkSay(0.6, "c1", o.tags.balance, "sys")],
     },
-    // 3 — the vacation request goes to approval
-    3: { len: 2.8, moves: [mkMove(0.1, 1.2, "agent-wf")], says: [mkSay(0.7, "wf", o.tags.approved, "sys")] },
+    // 3 — the request is written to the database and goes to approval
+    3: { len: 3.2, moves: [mkMove(0.1, 0.9, "agent-db"), mkMove(0.9, 1.3, "agent-wf")], says: [mkSay(0.7, "wf", o.tags.approved, "sys")] },
   };
   const shown = {} as Record<StationKey, boolean>;
   let scriptT = 0;
@@ -374,16 +390,16 @@ export function createStory(o: StoryOptions): () => void {
     t.divideScalar(ids.length);
     return { pos: t.clone().add(new THREE.Vector3(...dir).normalize().multiplyScalar(dist)), target: t };
   };
-  // the camera never zooms into a part of the machine: all four blocks stay in frame,
+  // the camera never zooms into a part of the machine: all blocks stay in frame,
   // only the distance breathes a little from stage to stage
-  const ALL: StationKey[] = ["tg", "agent", "c1", "wf"];
+  const ALL: StationKey[] = ["tg", "web", "rbac", "agent", "c1", "db", "wf"];
   const VIEW: [number, number, number] = [14.5, 25, 30];
   const STEPS: Step[] = [
     { cam: { pos: new THREE.Vector3(11, 20, 28), target: new THREE.Vector3(-2, 4, 1) }, hot: [], flows: [] },
-    { cam: focus(ALL, 40, VIEW), hot: ["tg"], flows: [] },
-    { cam: focus(ALL, 38, VIEW), hot: ["agent", "c1"], flows: [] },
-    { cam: focus(ALL, 38, VIEW), hot: ["wf"], flows: [] },
-    { cam: focus(ALL, 42, VIEW), hot: [], flows: ALL_FLOWS },
+    { cam: focus(ALL, 43, VIEW), hot: ["tg"], flows: [] },
+    { cam: focus(ALL, 42, VIEW), hot: ["rbac", "agent", "c1"], flows: [] },
+    { cam: focus(ALL, 42, VIEW), hot: ["db", "wf"], flows: [] },
+    { cam: focus(ALL, 45, VIEW), hot: [], flows: ALL_FLOWS },
   ];
   const SEG_TOTAL = SEGMENTS.reduce((a, b) => a + b, 0);
 
@@ -426,7 +442,7 @@ export function createStory(o: StoryOptions): () => void {
     wide = w > 820;
     if (wide) camera.setViewOffset(w, h, -w * 0.25, 0, w, h);
     else camera.setViewOffset(w, h, 0, h * 0.27, w, h);
-    // keep all four blocks in frame: pull the camera back as the window gets narrower
+    // keep every block in frame: pull the camera back as the window gets narrower
     distScale = wide ? Math.max(1, 1.62 / (w / h)) : w / h < 1 ? 1.75 : 1;
     camera.updateProjectionMatrix();
   };
@@ -621,6 +637,15 @@ export function createStory(o: StoryOptions): () => void {
       const labelOn = k > 0.85 && !overCopy;
       shown[s.id] = labelOn && Math.abs(proj.x) < 0.86 && proj.y < 0.8 && proj.y > -0.9;
       s.el.style.opacity = labelOn ? "1" : "0";
+    }
+    for (const p of props) {
+      const on = p.s.pivot.scale.y > 0.85 ? 1 : 0;
+      p.k += (on - p.k) * (o.reduced ? 1 : Math.min(1, dt * 6));
+      p.m.visible = p.k > 0.01;
+      p.m.scale.setScalar(Math.max(0.001, p.k * 0.92));
+      const bob = o.reduced ? 0 : Math.sin(now / 900 + p.phase) * 0.06;
+      p.m.position.set(p.s.cx, p.s.h + 0.8 + p.s.lift - p.s.downK * 0.12 + bob, p.s.cz);
+      p.m.rotation.set(0, 0.45 + (o.reduced ? 0 : Math.sin(now / 1700 + p.phase) * 0.3), 0);
     }
     Object.values(curves).forEach((c, i) => {
       const k = o.reduced ? 1 : clamp01((build - 0.35 - i * 0.04) / 0.45);
