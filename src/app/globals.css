@@ -78,8 +78,8 @@
   pointer-events: none;
 }
 .story-label b {
-  font: 700 10.5px var(--font-display);
-  letter-spacing: 0.06em;
+  font: 600 11.5px var(--font-sans);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--color-bg);
@@ -91,7 +91,9 @@
 .story-label span {
   font: 500 11px var(--font-sans);
   color: #fff;
-  text-shadow: 0 1px 6px rgba(10, 15, 61, 0.45);
+  background: rgba(10, 15, 61, 0.72);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 .story-label.is-hot b {
   background: var(--color-accent);
@@ -103,6 +105,7 @@
   position: absolute;
   inset-inline: 0;
   bottom: 0;
+  pointer-events: none;
   transform: translateY(var(--shift, 0px));
   will-change: opacity, transform;
 }
@@ -112,6 +115,23 @@
     bottom: auto;
     transform: translateY(calc(-50% + var(--shift, 0px)));
   }
+}
+
+/* signature hover: the button lifts off the page and leaves a hard isometric shadow */
+.btn-iso {
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 0.2s,
+    color 0.2s;
+}
+.btn-iso:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+.btn-iso:active {
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 var(--color-ink);
 }
 
 @keyframes float {

@@ -9,16 +9,23 @@ export const en: Dictionary = {
   },
   topbar: {
     langNav: "Site language",
+    mainNav: "Site sections",
+    cases: "Cases",
+    about: "About",
+    contact: "Discuss a task",
   },
   hero: {
-    title: "AI solutions and business process automation.",
-    subtitle: "I connect 1C, databases and APIs into a single system — and hand the routine over to AI agents.",
+    title: "I take routine work off your team.",
+    subtitle: "I connect 1C, databases and APIs into one system and put AI agents on the repetitive requests: statements, approvals, reports.",
     portraitAlt: "Developer portrait",
-    titleAccent: "automation",
+    titleAccent: "routine",
+    ctaPrimary: "Discuss a task",
+    ctaSecondary: "See the cases",
   },
   story: {
     hint: "Scroll to see how it works",
-    breakHint: "Click a block to switch it off",
+    cta: "See the cases",
+    breakHint: "Switch a block off: requests queue up instead of getting lost",
     offline: "offline",
     sceneLabel: "3D diagram of a typical automation architecture",
     chaos: {
@@ -27,11 +34,9 @@ export const en: Dictionary = {
       text: "Scattered documents become structured data that the system works with from then on.",
     },
     steps: [
-      { k: "Input", title: "Requests arrive from any channel", text: "Telegram, a web portal or an external service via API — everything lands in one system." },
-      { k: "AI agent", title: "The agent understands what needs doing", text: "It picks the right tools, while access rights are checked by code, not by the model." },
-      { k: "Data", title: "Data is taken where it lives", text: "Integrations with 1C, databases and external services via API — no manual copying." },
-      { k: "Process", title: "Then the process runs itself", text: "Approvals, notifications, reports — routine steps happen automatically." },
-      { k: "System", title: "One system instead of ten spreadsheets", text: "Channels, the AI agent, integrations and processes work as a single mechanism." },
+      { k: "Request", title: "An employee writes, the agent works out what to do", text: "The request comes from Telegram, the web portal or an API. The agent picks the tool, while access rights are checked by code, not by the model." },
+      { k: "Data & process", title: "Data comes from 1C, then the process runs itself", text: "Integrations with 1C and databases, with no manual copying. Approvals, notifications and reports happen automatically." },
+      { k: "System", title: "One system instead of ten spreadsheets", text: "This is how the three projects below are built." },
     ],
   },
   machine: {
@@ -52,13 +57,13 @@ export const en: Dictionary = {
   },
   about: {
     title: "About me",
-    text: "I build systems where data doesn't get lost between applications and routine operations run on their own. I integrate 1C, databases and external services via API, automate business processes and deploy AI agents — with access control enforced in code.",
+    text: "I automate internal processes for companies that run on 1C. I take the whole job: from the integration with the accounting database to the AI agent an employee messages in Telegram. I work solo: from mapping the process to deployment and support. Recent projects: an HR assistant with 25+ tools, an HR platform synchronised with 1C, and a BAS Retail to Glovo exchange for 32 stores. In my systems access rights are checked by code, not by the model.",
   },
   cases: casesEn,
   contact: {
     title: "Let's talk about your automation",
     text: "Tell me where your team loses time on routine work — I'll suggest what can be automated.",
-    write: "Write to me",
+    write: "Message me on Telegram",
     copy: "Copy address",
     copied: "Copied",
   },

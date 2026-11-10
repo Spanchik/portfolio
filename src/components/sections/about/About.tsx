@@ -28,7 +28,7 @@ export function About({ dict, lang }: { dict: Dictionary; lang: "uk" | "en" }) {
     <section
       id="about"
       aria-labelledby="about-title"
-      className="relative scroll-mt-4 overflow-hidden bg-paper text-ink selection:bg-bg selection:text-fg"
+      className="relative scroll-mt-16 overflow-hidden bg-paper text-ink selection:bg-bg selection:text-fg"
     >
       <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-center gap-12 px-4 py-20 md:px-8 md:py-32 lg:grid-cols-12 lg:gap-10">
         <motion.div {...reveal()} className="relative mx-auto w-full max-w-[460px] lg:col-span-5">
@@ -51,7 +51,7 @@ export function About({ dict, lang }: { dict: Dictionary; lang: "uk" | "en" }) {
           <motion.h2
             {...reveal(0.1)}
             id="about-title"
-            className="font-display text-4xl font-bold tracking-[-0.035em] md:text-6xl"
+            className="font-display text-4xl font-bold tracking-[-0.02em] md:text-6xl"
           >
             {dict.about.title}
             {name && <span className="block text-bg">{name}</span>}

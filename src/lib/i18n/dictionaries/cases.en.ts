@@ -2,9 +2,11 @@ import type { CasesDict } from "./cases.uk";
 
 export const casesEn: CasesDict = {
   eyebrow: "Case",
-  more: "Details",
+  more: "Show all",
   less: "Collapse",
   labels: { task: "Challenge", solution: "Solution", result: "Result", stack: "Stack" },
+  metricsNote: "Indicative figures, being confirmed",
+  mockNote: "Interface illustration, fictional data",
   mock: {
     chat: {
       label: "Demo of a conversation with the HR bot (fictional data)",
@@ -54,14 +56,34 @@ export const casesEn: CasesDict = {
       toast: "1C · employee created",
       lms: { title: "Onboarding", progress: "3 of 5 steps" },
     },
+    sync: {
+      label: "Demo of the catalogue and order exchange (fictional data)",
+      url: "delivery-sync / store #12",
+      kpis: [
+        { label: "Stores", value: "32" },
+        { label: "Sync", value: "20 min" },
+        { label: "Errors", value: "0" },
+      ],
+      columns: ["Item", "Price", "Stock", "Storefront"],
+      rows: [
+        { name: "Milk 2.5% 900 g", price: "42.90", stock: "18" },
+        { name: "Rye bread", price: "28.50", stock: "6" },
+        { name: "Bananas, kg", price: "59.00", stock: "0" },
+        { name: "Cottage cheese 5%", price: "64.90", stock: "11" },
+      ],
+      restock: "24",
+      synced: "Last sync: 2 min ago · 32 of 32 stores",
+      toast: "Glovo · storefront updated",
+      order: { title: "Order #5127", meta: "Glovo · 4 items", pending: "Received", done: "Receipt created in BAS" },
+    },
   },
   items: [
     {
       id: "assistant",
       name: "HR Assistant",
       title: "AI assistant for HR processes",
-      lead: "A multichannel AI agent (Telegram + Web) that handles the company's routine HR requests in self-service mode.",
-      task: "Take repetitive requests off HR and accounting: salary statements, vacation balances, HR documents and approvals scattered across messengers.",
+      lead: "An employee messages the bot in Telegram or the web portal and gets a statement, a vacation balance or an approved request with no HR involved.",
+      task: "HR and accounting answered about 400 repetitive requests a month by hand: salary statements, vacation balances, HR documents. Approvals got lost in messengers.",
       solution: [
         { b: "LLM agent with tool calling", t: "on Claude: 25+ tools; the agent detects intent and calls the right action with data from 1C." },
         { b: "Code-level RBAC:", t: "employee / manager / HR roles, tool filtering and a second access check before every call." },
@@ -70,15 +92,20 @@ export const casesEn: CasesDict = {
         { b: "Admin panel:", t: "roles, routes, templates, audit log, LLM cost monitoring with budget alerts." },
         { b: "Integrations:", t: "1C (UTP) and BAS Retail via MS SQL, Google Sheets, SQLite; deployed with Docker." },
       ],
-      result: "HR requests are handled 24/7 with no human in the loop, requests are approved automatically, and HR gets Excel reports in seconds.",
+      metrics: [
+        { value: "80%", label: "of requests with no HR involved" },
+        { value: "10 s", label: "to answer instead of 4 hours" },
+        { value: "1 day", label: "to approve instead of 3" },
+      ],
+      result: "The employee gets an answer straight away, and HR works with people, not with statements.",
       stack: ["Python", "Claude API", "Tool Calling", "python-telegram-bot", "Flask", "MS SQL", "Google Sheets API", "SQLite", "Docker"],
     },
     {
       id: "platform",
       name: "HR Platform",
       title: "HR ecosystem integrated with 1C",
-      lead: "A single platform for recruiting, HR processes and management analytics, synchronised with 1C.",
-      task: "Bring recruiting, onboarding and HR records into one system and remove double data entry between HR tools and 1C.",
+      lead: "Recruiting, onboarding and HR records in one platform that creates the employee in 1C by itself.",
+      task: "Recruiting, onboarding and HR records lived in separate tools, so every new hire was entered twice: in the HR system and in 1C. One hire took up to 40 minutes of paperwork.",
       solution: [
         { b: "ATS module:", t: "candidate pipeline, statuses, onboarding of new hires." },
         { b: "1C integration via HTTP service:", t: "automatic creation of individuals and employees, HR data sync." },
@@ -86,8 +113,35 @@ export const casesEn: CasesDict = {
         { b: "LMS integration:", t: "training and onboarding in a single loop." },
         { b: "Background jobs & notifications:", t: "Celery + Redis, a Telegram bot for alerts." },
       ],
-      result: "One entry point for HR; data flows between the platform and 1C with no manual transfer.",
+      metrics: [
+        { value: "5 min", label: "to register a hire instead of 40" },
+        { value: "0", label: "re-entries in 1C" },
+        { value: "30+", label: "hires a month through the platform" },
+      ],
+      result: "A hired candidate appears in 1C automatically, and management sees turnover and vacancies in one dashboard.",
       stack: ["Python", "Django", "PostgreSQL", "Celery", "Redis", "REST API", "1C HTTP service", "Telegram Bot", "Docker", "Nginx"],
+    },
+    {
+      id: "delivery",
+      name: "Delivery Sync",
+      title: "BAS Retail and Glovo: one exchange for 32 stores",
+      lead: "Prices, stock and orders move between BAS Retail and Glovo over the API by themselves: the storefront matches the shelf, and the receipt is created with no cashier involved.",
+      task: "A chain of 32 stores sells through Glovo. Prices and availability on the storefront drifted from the till, and every order was re-typed into a receipt by hand.",
+      solution: [
+        { b: "Price and stock exchange:", t: "every 20 minutes for every store; what is not on the shelf is switched off on the storefront." },
+        { b: "Automatic order intake:", t: "a Glovo order arrives over the API and becomes a receipt in BAS with no cashier involved." },
+        { b: "Business rules in code:", t: "minimum stock reserve, weighted goods, per-order quantity limits; 132 unit tests." },
+        { b: "Monitoring:", t: "Telegram alerts on failures, a healthcheck and a log of every run." },
+        { b: "Admin panel:", t: "store and rule settings, catalogue preview before it is sent." },
+        { b: "Integration platform:", t: "a shared core plus adapters, so a new delivery service is one more module; deployed with Docker." },
+      ],
+      metrics: [
+        { value: "32", label: "stores on one exchange" },
+        { value: "20 min", label: "between storefront updates" },
+        { value: "0", label: "receipts typed by hand" },
+      ],
+      result: "The customer sees on the storefront what is really on the shelf, and the cashier packs the order instead of re-typing it into the till.",
+      stack: ["Python", "FastAPI", "MS SQL", "BAS Retail", "Glovo API", "Telegram Bot", "Docker"],
     },
   ],
 };
