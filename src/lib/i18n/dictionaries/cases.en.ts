@@ -4,6 +4,7 @@ export const casesEn: CasesDict = {
   eyebrow: "Case",
   more: "Show all",
   less: "Collapse",
+  how: "How it was built",
   labels: { task: "Challenge", solution: "Solution", result: "Result", stack: "Stack" },
   metricsNote: "Indicative figures, being confirmed",
   mockNote: "Interface illustration, fictional data",

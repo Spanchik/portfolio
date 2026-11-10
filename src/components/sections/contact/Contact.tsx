@@ -7,6 +7,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/uk";
 import { site } from "@/lib/site";
 import { pts } from "../hero/iso";
 import { usePrefersReducedMotion } from "../hero/useStreamControls";
+import { ContactForm } from "./ContactForm";
 
 const EASE = [0.2, 0.7, 0.2, 1] as const;
 
@@ -32,7 +33,10 @@ function CubeShape({ c }: { c: Cube }) {
   );
 }
 
-/** Final call-to-action: big e-mail, copy button, profile links, decorative isometric cubes. */
+/**
+ * Final call-to-action on the dark finale. Top row: headline and the isometric cubes.
+ * Bottom row: the brief form (the primary action) and a short list of direct contacts.
+ */
 export function Contact({ dict }: { dict: Dictionary }) {
   const reduced = usePrefersReducedMotion();
   const [copied, setCopied] = useState(false);
@@ -54,83 +58,95 @@ export function Contact({ dict }: { dict: Dictionary }) {
       : {
           initial: { opacity: 0, y: 28 },
           whileInView: { opacity: 1, y: 0 },
-          viewport: { once: true, amount: 0.3 },
+          viewport: { once: true, amount: 0.2 },
           transition: { duration: 0.8, delay, ease: EASE },
         };
 
+  const row = "flex min-h-16 items-center justify-between gap-3 border-b border-fg/20 py-3";
+  const kind = "block text-xs font-semibold tracking-[0.12em] text-muted uppercase";
+  const value = "block truncate font-display text-[15px] font-medium tracking-[-0.01em] md:text-lg";
+  const round = "inline-flex size-11 shrink-0 items-center justify-center rounded-full border-[1.5px] border-fg/50 transition-colors group-hover:border-fg group-hover:bg-fg group-hover:text-ink";
+
   return (
     <section id="contact" aria-labelledby="contact-title" className="relative scroll-mt-16 overflow-hidden bg-ink [--iso-shadow:var(--color-bg)]">
-      <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-center gap-12 px-4 py-24 md:px-8 md:py-36 lg:grid-cols-12">
-        <div className="flex min-w-0 flex-col gap-8 lg:col-span-8">
-          <motion.h2
-            {...reveal()}
-            id="contact-title"
-            className="max-w-[14ch] font-display text-[clamp(1.85rem,5.4vw,5.2rem)] leading-[1.05] font-bold tracking-[-0.02em]"
-          >
-            {dict.contact.title}
-          </motion.h2>
-          <motion.p {...reveal(0.1)} className="max-w-[44ch] text-lg leading-relaxed text-fg/90 md:text-xl">
-            {dict.contact.text}
-          </motion.p>
-
-          <motion.div {...reveal(0.2)} className="flex min-w-0 items-center gap-3">
-            <a
-              href={`mailto:${email}`}
-              className="group min-w-0 truncate inline-flex min-h-10 items-center font-display text-[clamp(0.85rem,2.7vw,2.4rem)] font-bold tracking-[-0.02em] underline decoration-fg/40 decoration-2 underline-offset-[0.18em] hover:decoration-accent"
+      <div className="mx-auto max-w-[1360px] px-4 py-16 md:px-8 md:py-28">
+        <div className="grid grid-cols-1 items-end gap-8 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            <motion.h2
+              {...reveal()}
+              id="contact-title"
+              className="max-w-[16ch] font-display text-[clamp(1.9rem,5vw,4.8rem)] leading-[1.05] font-bold tracking-[-0.02em]"
             >
-              {email}
-            </a>
-            <button
-              type="button"
-              onClick={copy}
-              aria-label={copied ? dict.contact.copied : dict.contact.copy}
-              title={copied ? dict.contact.copied : dict.contact.copy}
-              className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border-[1.5px] border-fg/60 hover:border-fg"
-            >
-              {copied ? <Check size={18} strokeWidth={2.2} /> : <Copy size={18} strokeWidth={2} />}
-            </button>
-            <span role="status" className="sr-only">
-              {copied ? dict.contact.copied : ""}
-            </span>
-          </motion.div>
-
-          <motion.div {...reveal(0.3)} className="flex flex-wrap gap-3">
-            {/* one primary action: Telegram when set, otherwise e-mail (the address itself is above) */}
-            {telegram && (
-              <a
-                href={`https://t.me/${telegram}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-14 items-center gap-2 rounded-full bg-fg px-7 font-display text-sm font-bold text-bg btn-iso hover:bg-accent hover:text-ink"
-              >
-                {dict.contact.write}
-                <ArrowUpRight size={18} strokeWidth={2.2} />
-              </a>
-            )}
-            {github && (
-              <a
-                href={github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-14 items-center gap-2 rounded-full border-[1.5px] border-fg px-7 font-display text-sm font-bold btn-iso hover:bg-fg hover:text-bg"
-              >
-                GitHub <ArrowUpRight size={18} strokeWidth={2.2} />
-              </a>
-            )}
+              {dict.contact.title}
+            </motion.h2>
+            <motion.p {...reveal(0.1)} className="mt-5 max-w-[46ch] text-lg leading-relaxed text-fg/90 md:mt-6 md:text-xl">
+              {dict.contact.text}
+            </motion.p>
+          </div>
+          <motion.div aria-hidden {...reveal(0.15)} className="hidden w-full max-w-[250px] justify-self-end lg:col-span-4 lg:block">
+            <svg viewBox="-104 -96 208 195" className={reduced ? "w-full" : "w-full animate-[float_6s_ease-in-out_infinite]"}>
+              {CUBES.map((c, i) => (
+                <CubeShape key={i} c={c} />
+              ))}
+            </svg>
           </motion.div>
         </div>
 
-        <motion.div
-          aria-hidden
-          {...reveal(0.15)}
-          className="mx-auto w-full max-w-[220px] lg:col-span-4 lg:max-w-[340px]"
-        >
-          <svg viewBox="-104 -96 208 195" className={reduced ? "w-full" : "w-full animate-[float_6s_ease-in-out_infinite]"}>
-            {CUBES.map((c, i) => (
-              <CubeShape key={i} c={c} />
-            ))}
-          </svg>
-        </motion.div>
+        <div className="mt-10 grid grid-cols-1 gap-12 border-t border-fg/20 pt-10 md:mt-14 md:pt-14 lg:grid-cols-12 lg:gap-10">
+          <motion.div {...reveal(0.1)} className="min-w-0 lg:col-span-7">
+            <ContactForm dict={dict.contact.form} />
+          </motion.div>
+
+          <motion.div {...reveal(0.2)} className="min-w-0 lg:col-span-4 lg:col-start-9">
+            <h3 className="font-display text-xl font-medium tracking-[-0.01em] md:text-2xl">{dict.contact.direct}</h3>
+            <ul className="mt-5 border-t border-fg/20 md:mt-7">
+              <li className={row}>
+                <a href={`mailto:${email}`} className="min-w-0 py-1">
+                  <span className={kind}>Email</span>
+                  <span className={`${value} underline decoration-fg/30 decoration-2 underline-offset-4 hover:decoration-accent`}>{email}</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={copy}
+                  aria-label={copied ? dict.contact.copied : dict.contact.copy}
+                  title={copied ? dict.contact.copied : dict.contact.copy}
+                  className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border-[1.5px] border-fg/50 transition-colors hover:border-fg hover:bg-fg hover:text-ink"
+                >
+                  {copied ? <Check size={18} strokeWidth={2.2} /> : <Copy size={18} strokeWidth={2} />}
+                </button>
+                <span role="status" className="sr-only">
+                  {copied ? dict.contact.copied : ""}
+                </span>
+              </li>
+              {telegram && (
+                <li>
+                  <a href={`https://t.me/${telegram}`} target="_blank" rel="noopener noreferrer" className={`group ${row}`}>
+                    <span className="min-w-0">
+                      <span className={kind}>Telegram</span>
+                      <span className={value}>@{telegram}</span>
+                    </span>
+                    <span className={round}>
+                      <ArrowUpRight size={18} strokeWidth={2.2} />
+                    </span>
+                  </a>
+                </li>
+              )}
+              {github && (
+                <li>
+                  <a href={github} target="_blank" rel="noopener noreferrer" className={`group ${row}`}>
+                    <span className="min-w-0">
+                      <span className={kind}>GitHub</span>
+                      <span className={value}>{github.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                    </span>
+                    <span className={round}>
+                      <ArrowUpRight size={18} strokeWidth={2.2} />
+                    </span>
+                  </a>
+                </li>
+              )}
+            </ul>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -43,6 +43,9 @@ function CountUp({ value, reduced }: { value: string; reduced: boolean }) {
 function CaseSection({ item, index, dict }: { item: Item; index: number; dict: CasesDict }) {
   const reduced = usePrefersReducedMotion();
   const [open, setOpen] = useState(false);
+  // phones: the write-up is folded away under the mock-up and opens on tap
+  const [details, setDetails] = useState(false);
+  const detailsId = `case-${item.id}-details`;
   const paper = index % 2 === 1;
   const points = open ? item.solution : item.solution.slice(0, VISIBLE_POINTS);
   const listId = `case-${item.id}-solution`;
@@ -71,9 +74,9 @@ function CaseSection({ item, index, dict }: { item: Item; index: number; dict: C
       // overflow-x-clip (not hidden) so the mock-up can stay sticky while the text scrolls
       className={cn("relative scroll-mt-16 overflow-x-clip", paper && "paper-grid bg-paper text-ink selection:bg-bg selection:text-fg")}
     >
-      <div className="mx-auto max-w-[1360px] px-4 py-20 md:px-8 md:py-28">
+      <div className="mx-auto max-w-[1360px] px-4 py-14 md:px-8 md:py-28">
         {/* header spans the full width so the mock-up starts level with the body text */}
-        <motion.header {...reveal()} className="mb-12 max-w-[900px] lg:mb-16">
+        <motion.header {...reveal()} className="mb-8 max-w-[900px] md:mb-12 lg:mb-16">
           <span className="mb-5 inline-block rounded-full border-[1.5px] border-current px-3 py-1.5 text-xs font-semibold tracking-[0.12em] uppercase">
             {dict.eyebrow} · {item.name}
           </span>
@@ -82,7 +85,7 @@ function CaseSection({ item, index, dict }: { item: Item; index: number; dict: C
           </h2>
           <p className={cn("mt-5 max-w-[56ch] text-lg leading-relaxed md:text-xl", muted)}>{item.lead}</p>
           {/* who it was built for, on what, and by whom */}
-          <ul className={cn("mt-5 flex flex-wrap gap-x-6 gap-y-1.5 text-sm font-medium", muted)}>
+          <ul className={cn("mt-5 hidden flex-wrap gap-x-6 gap-y-1.5 text-sm font-medium sm:flex", muted)}>
             {item.context.map((c) => (
               <li key={c} className="flex items-center gap-2 before:size-1.5 before:shrink-0 before:rotate-45 before:bg-current">
                 {c}
@@ -92,24 +95,24 @@ function CaseSection({ item, index, dict }: { item: Item; index: number; dict: C
         </motion.header>
 
         {/* headline numbers: the result first, the how after */}
-        <div className="mb-12 lg:mb-16">
-          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mb-10 md:mb-12 lg:mb-16">
+          <dl className="grid grid-cols-3 gap-2.5 sm:gap-4">
             {item.metrics.map((m, i) => (
               // signature move: the tile is "extruded" out of the page, like the isometric blocks
               <motion.div
                 key={m.label}
                 initial={reduced ? false : { opacity: 0, x: 8, y: 8, boxShadow: "0px 0px 0px 0px #ff6a1a" }}
-                whileInView={{ opacity: 1, x: 0, y: 0, boxShadow: "7px 7px 0px 0px #ff6a1a" }}
+                whileInView={{ opacity: 1, x: 0, y: 0, boxShadow: "5px 5px 0px 0px #ff6a1a" }}
                 viewport={{ once: true, amount: 0.5 }}
                 transition={{ duration: 0.55, delay: 0.1 + i * 0.12, ease: EASE }}
-                style={reduced ? { boxShadow: "7px 7px 0px 0px #ff6a1a" } : undefined}
+                style={reduced ? { boxShadow: "5px 5px 0px 0px #ff6a1a" } : undefined}
                 className={cn(
-                  "flex flex-col-reverse justify-end gap-2 rounded-2xl border-[1.5px] p-5 md:p-6",
+                  "flex flex-col-reverse justify-end gap-1.5 rounded-xl border-[1.5px] p-2.5 sm:gap-2 sm:rounded-2xl sm:p-5 md:p-6",
                   paper ? "border-ink bg-paper" : "border-fg bg-bg",
                 )}
               >
-                <dt className={cn("text-sm leading-snug md:text-base", muted)}>{m.label}</dt>
-                <dd className={cn("font-display text-[clamp(2rem,3.6vw,3.2rem)] leading-none font-bold tracking-[-0.02em]", paper && "text-bg")}>
+                <dt className={cn("text-[11.5px] leading-tight sm:text-sm sm:leading-snug md:text-base", muted)}>{m.label}</dt>
+                <dd className={cn("font-display text-[1.1rem] leading-none font-bold tracking-[-0.02em] sm:text-[clamp(2rem,3.6vw,3.2rem)]", paper && "text-bg")}>
                   <CountUp value={m.value} reduced={reduced} />
                 </dd>
               </motion.div>
@@ -118,8 +121,22 @@ function CaseSection({ item, index, dict }: { item: Item; index: number; dict: C
           {dict.metricsNote && item.draft && <p className={cn("mt-5 text-[13px]", muted)}>{dict.metricsNote}</p>}
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-12 lg:gap-12">
-          <div className={cn("flex min-w-0 flex-col gap-8 lg:col-span-5", paper && "lg:order-2")}>
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-12">
+          <div className={cn("order-2 flex min-w-0 flex-col gap-6 lg:order-none lg:col-span-5", paper && "lg:order-2")}>
+            <button
+              type="button"
+              aria-expanded={details}
+              aria-controls={detailsId}
+              onClick={() => setDetails((v) => !v)}
+              className={cn(
+                "inline-flex h-12 items-center justify-between gap-3 rounded-full border-[1.5px] px-5 text-sm font-semibold lg:hidden",
+                paper ? "border-ink" : "border-fg",
+              )}
+            >
+              {details ? dict.less : dict.how}
+              <ChevronDown size={18} strokeWidth={2.2} className={cn("transition-transform", details && "rotate-180")} />
+            </button>
+            <div id={detailsId} className={cn("flex-col gap-8 lg:flex", details ? "flex" : "hidden")}>
             <motion.div {...reveal(0.05)}>
               <h3 className={label}>{dict.labels.task}</h3>
               <p className={cn("leading-relaxed", muted)}>{item.task}</p>
@@ -172,9 +189,10 @@ function CaseSection({ item, index, dict }: { item: Item; index: number; dict: C
                 ))}
               </ul>
             </motion.div>
+            </div>
           </div>
 
-          <motion.div {...reveal(0.1)} className={cn("min-w-0 lg:sticky lg:top-24 lg:col-span-7", paper && "lg:order-1")}>
+          <motion.div {...reveal(0.1)} className={cn("order-1 min-w-0 lg:sticky lg:top-24 lg:order-none lg:col-span-7", paper && "lg:order-1")}>
             {item.id === "assistant" ? (
               <PhoneChat dict={dict.mock.chat} />
             ) : item.id === "platform" ? (
@@ -184,7 +202,7 @@ function CaseSection({ item, index, dict }: { item: Item; index: number; dict: C
             ) : (
               <SiteMock dict={dict.mock.site} />
             )}
-            {item.draft && <p className={cn("mt-12 text-center text-[13px]", muted)}>{dict.mockNote}</p>}
+            {item.draft && <p className={cn("mt-6 text-center text-[13px] sm:mt-12", muted)}>{dict.mockNote}</p>}
           </motion.div>
         </div>
       </div>
