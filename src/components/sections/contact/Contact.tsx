@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { ArrowUpRight, Check, Copy } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uk";
-import { primaryContactHref, site } from "@/lib/site";
+import { site } from "@/lib/site";
 import { pts } from "../hero/iso";
 import { usePrefersReducedMotion } from "../hero/useStreamControls";
 
@@ -59,13 +59,13 @@ export function Contact({ dict }: { dict: Dictionary }) {
         };
 
   return (
-    <section id="contact" aria-labelledby="contact-title" className="relative overflow-hidden">
+    <section id="contact" aria-labelledby="contact-title" className="relative scroll-mt-16 overflow-hidden bg-panel">
       <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-center gap-12 px-4 py-24 md:px-8 md:py-36 lg:grid-cols-12">
         <div className="flex min-w-0 flex-col gap-8 lg:col-span-8">
           <motion.h2
             {...reveal()}
             id="contact-title"
-            className="max-w-[14ch] font-display text-[clamp(1.85rem,5.4vw,5.2rem)] leading-[1.02] font-bold tracking-[-0.04em]"
+            className="max-w-[14ch] font-display text-[clamp(1.85rem,5.4vw,5.2rem)] leading-[1.05] font-bold tracking-[-0.02em]"
           >
             {dict.contact.title}
           </motion.h2>
@@ -73,10 +73,10 @@ export function Contact({ dict }: { dict: Dictionary }) {
             {dict.contact.text}
           </motion.p>
 
-          <motion.div {...reveal(0.2)} className="flex min-w-0 flex-wrap items-center gap-3">
+          <motion.div {...reveal(0.2)} className="flex min-w-0 items-center gap-3">
             <a
               href={`mailto:${email}`}
-              className="group min-w-0 truncate font-display text-[clamp(1.05rem,3.2vw,2.6rem)] font-bold tracking-[-0.03em] underline decoration-fg/40 decoration-2 underline-offset-[0.18em] hover:decoration-accent"
+              className="group min-w-0 truncate font-display text-[clamp(0.85rem,3vw,2.4rem)] font-bold tracking-[-0.02em] underline decoration-fg/40 decoration-2 underline-offset-[0.18em] hover:decoration-accent"
             >
               {email}
             </a>
@@ -95,21 +95,16 @@ export function Contact({ dict }: { dict: Dictionary }) {
           </motion.div>
 
           <motion.div {...reveal(0.3)} className="flex flex-wrap gap-3">
-            <a
-              href={primaryContactHref()}
-              className="inline-flex h-14 items-center gap-2 rounded-full bg-fg px-7 font-display text-sm font-bold text-bg transition-[transform,background-color,color] duration-200 hover:-translate-y-0.5 hover:bg-accent hover:text-ink"
-            >
-              {dict.contact.write}
-              <ArrowUpRight size={18} strokeWidth={2.2} />
-            </a>
+            {/* one primary action: Telegram when set, otherwise e-mail (the address itself is above) */}
             {telegram && (
               <a
                 href={`https://t.me/${telegram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-14 items-center gap-2 rounded-full border-[1.5px] border-fg px-7 font-display text-sm font-bold transition-[transform,background-color,color] duration-200 hover:-translate-y-0.5 hover:bg-fg hover:text-bg"
+                className="inline-flex h-14 items-center gap-2 rounded-full bg-fg px-7 font-display text-sm font-bold text-bg btn-iso hover:bg-accent hover:text-ink"
               >
-                Telegram <ArrowUpRight size={18} strokeWidth={2.2} />
+                {dict.contact.write}
+                <ArrowUpRight size={18} strokeWidth={2.2} />
               </a>
             )}
             {github && (
@@ -117,7 +112,7 @@ export function Contact({ dict }: { dict: Dictionary }) {
                 href={github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-14 items-center gap-2 rounded-full border-[1.5px] border-fg px-7 font-display text-sm font-bold transition-[transform,background-color,color] duration-200 hover:-translate-y-0.5 hover:bg-fg hover:text-bg"
+                className="inline-flex h-14 items-center gap-2 rounded-full border-[1.5px] border-fg px-7 font-display text-sm font-bold btn-iso hover:bg-fg hover:text-bg"
               >
                 GitHub <ArrowUpRight size={18} strokeWidth={2.2} />
               </a>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uk";
 import { cn } from "@/lib/cn";
 import { IsoMachine } from "../hero/IsoMachine";
@@ -32,6 +33,7 @@ export function Story({ dict }: { dict: Dictionary }) {
   };
   const subsKey = JSON.stringify(subs);
   const offlineLabel = dict.story.offline;
+  const scriptKey = JSON.stringify(dict.story.script);
 
   useEffect(() => {
     let dispose: (() => void) | undefined;
@@ -51,6 +53,7 @@ export function Story({ dict }: { dict: Dictionary }) {
             stepEls: stepRefs.current.filter(Boolean) as HTMLElement[],
             railEls: railRefs.current.filter(Boolean) as HTMLElement[],
             subs: JSON.parse(subsKey),
+            script: JSON.parse(scriptKey),
             reduced,
           });
         } catch {
@@ -62,7 +65,7 @@ export function Story({ dict }: { dict: Dictionary }) {
       cancelled = true;
       dispose?.();
     };
-  }, [reduced, subsKey, offlineLabel]);
+  }, [reduced, subsKey, scriptKey, offlineLabel]);
 
   const words = dict.hero.title.split(" ");
   // prologue step ("from chaos") + the architecture walk-through
@@ -73,7 +76,7 @@ export function Story({ dict }: { dict: Dictionary }) {
       ref={trackRef}
       id="hero"
       aria-labelledby="hero-title"
-      className={cn("relative", fallback ? "h-dvh" : "h-[750vh]")}
+      className={cn("relative", fallback ? "h-dvh" : "h-[400vh]")}
     >
       <div className="sticky top-0 h-dvh overflow-hidden">
         {fallback ? (
@@ -99,7 +102,7 @@ export function Story({ dict }: { dict: Dictionary }) {
           <p
             ref={hintRef}
             aria-hidden
-            className="pointer-events-none absolute right-4 bottom-6 z-10 hidden items-center gap-2 rounded-full bg-ink/70 px-4 py-2 text-xs font-semibold opacity-0 backdrop-blur transition-opacity duration-300 md:right-8 md:inline-flex"
+            className="pointer-events-none absolute right-4 bottom-6 z-10 hidden items-center gap-2 rounded-full bg-ink/70 px-4 py-2 text-xs font-semibold opacity-0 backdrop-blur transition-opacity duration-300 md:right-8 lg:inline-flex"
           >
             <span aria-hidden className="size-2 rotate-45 bg-accent" />
             {dict.story.breakHint}
@@ -118,10 +121,10 @@ export function Story({ dict }: { dict: Dictionary }) {
             ref={(el) => {
               stepRefs.current[0] = el;
             }}
-            className="story-step pointer-events-auto"
+            className="story-step"
             style={{ opacity: 1 }}
           >
-            <h1 id="hero-title" className="font-display text-[clamp(2.3rem,4.6vw,4.9rem)] leading-[1.03] font-bold tracking-[-0.04em]">
+            <h1 id="hero-title" className="font-display text-[clamp(2.3rem,4.6vw,4.9rem)] leading-[1.05] font-bold tracking-[-0.02em]">
               {words.map((w, i) => (
                 <span key={i}>
                   {bare(w) === dict.hero.titleAccent ? <em className="bg-fg px-[0.12em] text-bg not-italic">{w}</em> : w}
@@ -130,9 +133,24 @@ export function Story({ dict }: { dict: Dictionary }) {
               ))}
             </h1>
             <p className="mt-6 max-w-[36ch] text-base leading-relaxed text-fg/90 md:text-lg">{dict.hero.subtitle}</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <a
+                href="#contact"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-fg px-6 text-sm font-semibold text-bg btn-iso hover:bg-accent hover:text-ink"
+              >
+                {dict.hero.ctaPrimary}
+                <ArrowUpRight size={17} strokeWidth={2.2} />
+              </a>
+              <a
+                href="#cases"
+                className="inline-flex h-12 items-center gap-2 rounded-full border-[1.5px] border-fg px-6 text-sm font-semibold btn-iso hover:bg-fg hover:text-bg"
+              >
+                {dict.hero.ctaSecondary}
+              </a>
+            </div>
             {!fallback && (
-              <p className="mt-8 inline-flex items-center gap-3 text-[13px] font-semibold text-fg/85">
-                <span aria-hidden className="relative h-8 w-5 rounded-full border-2 border-fg after:absolute after:top-1.5 after:left-1/2 after:h-2 after:w-1 after:-translate-x-1/2 after:animate-bounce after:rounded-full after:bg-fg" />
+              <p className="mt-7 inline-flex items-center gap-2 text-[13px] font-semibold text-fg/80">
+                <ArrowDown aria-hidden size={16} strokeWidth={2.2} className="motion-safe:animate-bounce" />
                 {dict.story.hint}
               </p>
             )}
@@ -152,8 +170,17 @@ export function Story({ dict }: { dict: Dictionary }) {
                 <span className="mb-5 inline-block rounded-full bg-accent px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-ink uppercase">
                   {st.k}
                 </span>
-                <h2 className="font-display text-[clamp(1.8rem,3.4vw,3.4rem)] leading-[1.05] font-bold tracking-[-0.035em]">{st.title}</h2>
+                <h2 className="font-display text-[clamp(1.8rem,3.4vw,3.4rem)] leading-[1.08] font-bold tracking-[-0.02em]">{st.title}</h2>
                 <p className="mt-5 max-w-[36ch] text-base leading-relaxed text-fg/90 md:text-lg">{st.text}</p>
+                {i === steps.length - 1 && (
+                  <a
+                    href="#cases"
+                    className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-fg px-6 text-sm font-semibold text-bg btn-iso hover:bg-accent hover:text-ink"
+                  >
+                    {dict.story.cta}
+                    <ArrowDown size={17} strokeWidth={2.2} />
+                  </a>
+                )}
               </div>
             ))}
         </div>

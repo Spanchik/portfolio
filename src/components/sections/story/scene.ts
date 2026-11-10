@@ -29,6 +29,8 @@ export type StoryOptions = {
   hintEl: HTMLElement;
   /** Label sub-text for a switched-off block. */
   offlineLabel: string;
+  /** Lines of the scripted request that travels through the machine on steps 2–3. */
+  script: { ask: string; role: string; tool: string; balance: string; answer: string; approved: string };
 };
 
 const ORANGE = 0xff6a1a;
@@ -52,8 +54,10 @@ const ROUTES: [StationKey, StationKey][] = [
 
 const CX = 8.8;
 const CZ = 4.5;
-/** Scroll share per step transition: the prologue gets 1.5 screens, the rest 1 each. */
-export const SEGMENTS = [1.5, 1, 1, 1, 1, 1];
+/** Scroll share per step transition: the prologue gets one screen, the rest 0.6 each. */
+export const SEGMENTS = [1, 0.6, 0.6, 0.6];
+/** Share of the track used by the transitions; the remainder holds the last step on screen. */
+const TRACK_USE = 0.92;
 
 type Station = (typeof RAW)[number] & {
   pivot: THREE.Group;
@@ -301,6 +305,54 @@ export function createStory(o: StoryOptions): () => void {
     packets.push({ m, c, t: 0, speed: 3.2 / c.len, to: key.split("-")[1] as StationKey });
   };
 
+  // ── scripted request (steps 2–3): one HR request from the first case travels through the machine, on a loop
+  type Move = { t: number; dur: number; key: string; rev: boolean; m: THREE.Mesh };
+  type Say = { t: number; id: StationKey; el: HTMLElement; alt?: Say };
+  const mkMove = (t: number, dur: number, key: string, rev = false): Move => {
+    const m = new THREE.Mesh(cubeGeo, cubeMat);
+    m.castShadow = true;
+    m.visible = false;
+    m.scale.setScalar(1.3);
+    scene.add(m);
+    return { t, dur, key, rev, m };
+  };
+  const mkSay = (t: number, id: StationKey, text: string, kind: "user" | "sys"): Say => {
+    const el = document.createElement("div");
+    el.className = `story-bubble is-${kind}`;
+    el.textContent = text;
+    el.style.opacity = "0";
+    const obj = new CSS2DObject(el);
+    obj.position.set(S[id].cx, S[id].h + (id === "agent" ? 3.4 : 2.1), S[id].cz);
+    scene.add(obj);
+    return { t, id, el };
+  };
+  const SCRIPTS: Record<number, { len: number; moves: Move[]; says: Say[] }> = {
+    // the question arrives, the role is checked in code, the agent picks a tool
+    2: {
+      len: 7,
+      moves: [mkMove(0.9, 1.1, "tg-agent"), mkMove(2.3, 0.8, "rbac-agent"), mkMove(4.0, 1.0, "agent-tools")],
+      says: [mkSay(0.2, "tg", o.script.ask, "user"), mkSay(2.0, "rbac", o.script.role, "sys"), mkSay(3.2, "agent", o.script.tool, "sys")],
+    },
+    // the balance comes back from 1C, the agent answers, the request goes for approval
+    3: {
+      len: 9.5,
+      moves: [
+        mkMove(0.3, 0.9, "agent-tools"), mkMove(1.2, 0.9, "tools-c1"),
+        mkMove(2.7, 0.9, "tools-c1", true), mkMove(3.6, 0.9, "agent-tools", true),
+        mkMove(5.3, 0.8, "agent-tools"), mkMove(6.1, 0.9, "tools-wf"),
+      ],
+      // on narrow windows 1C is off screen: the balance is then shown over "Integrations" instead
+      says: [
+        { ...mkSay(2.1, "c1", o.script.balance, "sys"), alt: mkSay(2.1, "tools", o.script.balance, "sys") },
+        mkSay(4.5, "agent", o.script.answer, "user"),
+        mkSay(7.0, "wf", o.script.approved, "sys"),
+      ],
+    },
+  };
+  const shown = {} as Record<StationKey, boolean>;
+  let scriptT = 0;
+  let scriptStep = -1;
+
   // ── chaos objects
   type Obj = {
     m: THREE.Group; cube: THREE.Mesh; base: THREE.Vector3; amp: THREE.Vector3; freq: number; phase: number;
@@ -337,10 +389,8 @@ export function createStory(o: StoryOptions): () => void {
   const STEPS: Step[] = [
     { cam: { pos: new THREE.Vector3(11, 20, 28), target: new THREE.Vector3(-2, 4, 1) }, hot: [], flows: [] },
     { cam: { pos: new THREE.Vector3(18, 32, 38), target: new THREE.Vector3(0, 0, 0.5) }, hot: [], flows: ALL_FLOWS },
-    { cam: focus(["tg", "web", "api"], 17, [1.3, 1.25, 1.0]), hot: ["tg", "web", "api"], flows: ["tg-agent", "web-api", "api-agent"] },
-    { cam: focus(["agent"], 17, [1.15, 1.0, 0.75], 0.6), hot: ["agent", "rbac"], flows: ["rbac-agent", "agent-tools", "tg-agent"] },
-    { cam: focus(["c1", "db"], 16, [1.0, 1.15, 1.05]), hot: ["c1", "db", "tools"], flows: ["tools-c1", "tools-db", "agent-tools"] },
-    { cam: focus(["wf"], 15, [1.3, 1.2, 0.5]), hot: ["wf"], flows: ["tools-wf", "agent-tools"] },
+    { cam: focus(["tg", "api", "agent"], 21, [1.2, 1.15, 0.9]), hot: ["tg", "agent", "rbac"], flows: [] },
+    { cam: focus(["agent", "tools", "c1", "wf"], 27, [1.1, 1.25, 0.95]), hot: ["agent", "tools", "c1", "wf"], flows: [] },
     { cam: { pos: new THREE.Vector3(24, 31, 27), target: new THREE.Vector3(0, 0, 0.5) }, hot: [], flows: ALL_FLOWS },
   ];
   const SEG_TOTAL = SEGMENTS.reduce((a, b) => a + b, 0);
@@ -349,11 +399,15 @@ export function createStory(o: StoryOptions): () => void {
   const readScroll = () => {
     const r = o.track.getBoundingClientRect();
     const total = Math.max(1, o.track.offsetHeight - window.innerHeight);
-    let u = Math.min(1, Math.max(0, -r.top / total)) * SEG_TOTAL;
+    let u = Math.min(1, Math.max(0, -r.top / total / TRACK_USE)) * SEG_TOTAL;
     let p = 0;
-    for (const s of SEGMENTS) {
+    for (let i = 0; i < SEGMENTS.length; i++) {
+      const s = SEGMENTS[i];
       if (u <= s) {
-        p += u / s;
+        // each step dwells at both ends of its segment, so its copy stays readable
+        // and the cross-fade takes only the middle of the scroll distance
+        const f = u / s;
+        p += i === 0 ? clamp01(f / 0.9) : clamp01((f - 0.18) / 0.64);
         break;
       }
       u -= s;
@@ -368,6 +422,7 @@ export function createStory(o: StoryOptions): () => void {
   };
 
   let distScale = 1;
+  let wide = true;
   const resize = () => {
     const w = o.canvas.clientWidth;
     const h = o.canvas.clientHeight;
@@ -376,7 +431,8 @@ export function createStory(o: StoryOptions): () => void {
     labelRenderer.setSize(w, h);
     camera.aspect = w / h;
     // desktop: copy sits on the left → lens-shift the image right; phones: copy at the bottom → lift it
-    if (w > 820) camera.setViewOffset(w, h, -w * 0.25, 0, w, h);
+    wide = w > 820;
+    if (wide) camera.setViewOffset(w, h, -w * 0.25, 0, w, h);
     else camera.setViewOffset(w, h, 0, h * 0.2, w, h);
     distScale = w / h < 1 ? 1.75 : 1;
     camera.updateProjectionMatrix();
@@ -416,12 +472,10 @@ export function createStory(o: StoryOptions): () => void {
   const ndc = new THREE.Vector2();
   const meshToId = new Map<THREE.Object3D, StationKey>(Object.values(S).map((st) => [st.mesh, st.id]));
   const ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.3);
-  const finePointer = window.matchMedia("(pointer: fine)").matches;
   const WHITE = new THREE.Color(0xf7f8ff);
   const DOWN = new THREE.Color(0x8c96c8);
   let interactive = false;
   let hovered: StationKey | null = null;
-  let overCanvas = false;
   const pointerPos = new THREE.Vector3();
   const flyers: { m: THREE.Mesh; from: THREE.Vector3; ctrl: THREE.Vector3; to: THREE.Vector3; t: number; id: StationKey }[] = [];
 
@@ -445,16 +499,13 @@ export function createStory(o: StoryOptions): () => void {
     flyers.push({ m, from, ctrl, to, t: 0, id });
   };
   const onCanvasMove = (e: PointerEvent) => {
-    overCanvas = true;
-    o.cursorEl.style.transform = "translate(" + e.clientX + "px, " + e.clientY + "px) rotate(45deg)";
     if (!interactive) return;
     const id = pick(e);
     if (id !== hovered && id && e.pointerType === "mouse") flyTo(id);
     hovered = id;
-    o.canvas.style.cursor = id ? "pointer" : finePointer ? "none" : "";
+    o.canvas.style.cursor = id ? "pointer" : "";
   };
   const onCanvasLeave = () => {
-    overCanvas = false;
     hovered = null;
   };
   const onCanvasClick = (e: MouseEvent) => {
@@ -485,6 +536,7 @@ export function createStory(o: StoryOptions): () => void {
   const start = camAt(progress);
   const camPos = start.pos.clone();
   const camTarget = start.target.clone();
+  const proj = new THREE.Vector3();
   const drift = new THREE.Vector3();
   const vpos = new THREE.Vector3();
   const offset = new THREE.Vector3();
@@ -540,10 +592,10 @@ export function createStory(o: StoryOptions): () => void {
     const cur = Math.round(progress);
     interactive = build > 0.98;
     o.hintEl.style.opacity = interactive && progress > 0.98 && progress < STEPS.length - 1.02 ? "1" : "0";
-    o.cursorEl.style.opacity = interactive && overCanvas && finePointer && !hovered ? "1" : "0";
+    o.cursorEl.style.opacity = "0";
     if (!interactive && o.canvas.style.cursor) o.canvas.style.cursor = "";
     const spinUp = o.reduced ? 0 : 0.8 + bell(pro, 0.55, 0.25) * 14;
-    ring.rotation.z += dt * (cur === 3 && !o.reduced ? 2.4 : spinUp);
+    ring.rotation.z += dt * (cur === 2 && !o.reduced ? 2.4 : spinUp);
     ring2.rotation.z -= dt * spinUp * 0.6;
     ring.scale.setScalar(1 + blast * 0.6);
     ring2.scale.setScalar(1 + blast * 1.2);
@@ -566,7 +618,12 @@ export function createStory(o: StoryOptions): () => void {
       s.pivot.visible = k > 0.002;
       s.mesh.castShadow = k > 0.3;
       (s.edges.material as THREE.LineBasicMaterial).opacity = (0.9 - k * 0.8) * intro;
-      s.el.style.opacity = k > 0.85 ? "1" : "0";
+      // hide labels that would land on the copy (left on desktop, bottom on phones)
+      proj.set(s.cx, s.h, s.cz).project(camera);
+      const overCopy = wide ? proj.x < -0.06 : proj.y < -0.2;
+      const labelOn = k > 0.85 && !overCopy;
+      shown[s.id] = labelOn && Math.abs(proj.x) < 0.86 && proj.y < 0.8 && proj.y > -0.9;
+      s.el.style.opacity = labelOn ? "1" : "0";
     }
     Object.values(curves).forEach((c, i) => {
       const k = o.reduced ? 1 : clamp01((build - 0.35 - i * 0.04) / 0.45);
@@ -587,9 +644,12 @@ export function createStory(o: StoryOptions): () => void {
     // copy cross-fade + progress rail
     o.stepEls.forEach((el, i) => {
       const d = progress - i;
-      el.style.opacity = Math.max(0, 1 - Math.abs(d) * 2.4).toFixed(3);
-      el.style.setProperty("--shift", `${(-d * 60).toFixed(1)}px`);
-      el.setAttribute("aria-hidden", Math.abs(d) < 0.5 ? "false" : "true");
+      const on = Math.abs(d) < 0.5;
+      el.style.opacity = clamp01(1.25 - Math.abs(d) * 2.5).toFixed(3);
+      el.style.setProperty("--shift", `${(-d * 40).toFixed(1)}px`);
+      el.setAttribute("aria-hidden", on ? "false" : "true");
+      el.style.pointerEvents = on ? "auto" : "none";
+      el.inert = !on;
     });
     o.railEls.forEach((b, i) => (b.style.transform = `scaleY(${Math.min(1, Math.max(0, progress - i + 1)).toFixed(3)})`));
 
@@ -601,6 +661,36 @@ export function createStory(o: StoryOptions): () => void {
       s.heat += (want - s.heat) * Math.min(1, dt * 6);
       s.mat.emissiveIntensity = s.down ? 0 : s.heat * 0.22;
       s.el.classList.toggle("is-hot", want === 1);
+    }
+
+    // scripted request: packets and speech bubbles follow a fixed timeline while a step is on screen
+    if (cur !== scriptStep) {
+      scriptStep = cur;
+      scriptT = 0;
+    }
+    const active = SCRIPTS[cur];
+    if (active && build > 0.95) scriptT = o.reduced ? active.len - 0.01 : (scriptT + dt) % (active.len + 0.7);
+    for (const [step, sc] of Object.entries(SCRIPTS)) {
+      const on = Number(step) === cur && build > 0.95;
+      for (const mv of sc.moves) {
+        const u = (scriptT - mv.t) / mv.dur;
+        mv.m.visible = on && !o.reduced && u >= 0 && u <= 1;
+        if (!mv.m.visible) continue;
+        const pt = curves[mv.key].path.getPointAt(mv.rev ? 1 - u : u);
+        mv.m.position.set(pt.x, 0.38, pt.z);
+        mv.m.rotation.y += dt * 3;
+        if (u > 0.9) {
+          const [from, to] = mv.key.split("-") as StationKey[];
+          const dest = S[mv.rev ? from : to];
+          dest.heat = Math.max(dest.heat, 1);
+        }
+      }
+      // bubbles stay until the loop ends, then fade out together before it restarts
+      for (const say of sc.says) {
+        const due = on && scriptT >= say.t && scriptT < sc.len;
+        say.el.style.opacity = due && shown[say.id] ? "1" : "0";
+        if (say.alt) say.alt.el.style.opacity = due && !shown[say.id] && shown[say.alt.id] ? "1" : "0";
+      }
     }
 
     // packets along the active step's routes
