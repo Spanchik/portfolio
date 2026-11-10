@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 export function Footer({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const year = new Date().getFullYear();
   return (
-    <footer className="border-t-[1.5px] border-line bg-panel">
+    <footer className="border-t border-fg/15 bg-ink">
       <div className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-4 px-4 py-6 text-[13px] font-semibold md:px-8">
         <p>
           © {year} {site.name[lang]}

@@ -331,7 +331,7 @@ export function createStory(o: StoryOptions): () => void {
     2: {
       len: 7,
       moves: [mkMove(0.9, 1.1, "tg-agent"), mkMove(2.3, 0.8, "rbac-agent"), mkMove(4.0, 1.0, "agent-tools")],
-      says: [mkSay(0.2, "tg", o.script.ask, "user"), mkSay(2.0, "rbac", o.script.role, "sys"), mkSay(3.2, "agent", o.script.tool, "sys")],
+      says: [mkSay(0, "tg", o.script.ask, "user"), mkSay(0.5, "rbac", o.script.role, "sys"), mkSay(1.0, "agent", o.script.tool, "sys")],
     },
     // the balance comes back from 1C, the agent answers, the request goes for approval
     3: {
@@ -343,14 +343,16 @@ export function createStory(o: StoryOptions): () => void {
       ],
       // on narrow windows 1C is off screen: the balance is then shown over "Integrations" instead
       says: [
-        { ...mkSay(2.1, "c1", o.script.balance, "sys"), alt: mkSay(2.1, "tools", o.script.balance, "sys") },
-        mkSay(4.5, "agent", o.script.answer, "user"),
-        mkSay(7.0, "wf", o.script.approved, "sys"),
+        { ...mkSay(0, "c1", o.script.balance, "sys"), alt: mkSay(0, "tools", o.script.balance, "sys") },
+        mkSay(0.6, "agent", o.script.answer, "user"),
+        mkSay(1.2, "wf", o.script.approved, "sys"),
       ],
     },
   };
   const shown = {} as Record<StationKey, boolean>;
   let scriptT = 0;
+  /** Seconds since the current step came on screen (not looped): drives the bubbles. */
+  let stepT = 0;
   let scriptStep = -1;
 
   // ── chaos objects
@@ -667,9 +669,13 @@ export function createStory(o: StoryOptions): () => void {
     if (cur !== scriptStep) {
       scriptStep = cur;
       scriptT = 0;
+      stepT = 0;
     }
     const active = SCRIPTS[cur];
-    if (active && build > 0.95) scriptT = o.reduced ? active.len - 0.01 : (scriptT + dt) % (active.len + 0.7);
+    if (active && build > 0.95) {
+      scriptT = o.reduced ? 0 : (scriptT + dt) % (active.len + 0.7);
+      stepT = o.reduced ? 99 : stepT + dt;
+    }
     for (const [step, sc] of Object.entries(SCRIPTS)) {
       const on = Number(step) === cur && build > 0.95;
       for (const mv of sc.moves) {
@@ -685,9 +691,10 @@ export function createStory(o: StoryOptions): () => void {
           dest.heat = Math.max(dest.heat, 1);
         }
       }
-      // bubbles stay until the loop ends, then fade out together before it restarts
+      // bubbles appear within the first second and a half and stay while the step is on screen,
+      // so a fast scroll still shows the whole exchange; only the packets keep looping
       for (const say of sc.says) {
-        const due = on && scriptT >= say.t && scriptT < sc.len;
+        const due = on && stepT >= say.t;
         say.el.style.opacity = due && shown[say.id] ? "1" : "0";
         if (say.alt) say.alt.el.style.opacity = due && !shown[say.id] && shown[say.alt.id] ? "1" : "0";
       }

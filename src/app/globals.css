@@ -144,6 +144,14 @@
   }
 }
 
+/* faint blueprint grid on the light sections, echoing the 3D floor */
+.paper-grid {
+  background-image:
+    linear-gradient(rgba(10, 15, 61, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 15, 61, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
 /* signature hover: the button lifts off the page and leaves a hard isometric shadow */
 .btn-iso {
   transition:
@@ -154,7 +162,7 @@
 }
 .btn-iso:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 4px 4px 0 var(--color-ink);
+  box-shadow: 4px 4px 0 var(--iso-shadow, var(--color-ink));
 }
 .btn-iso:active {
   transform: translate(0, 0);

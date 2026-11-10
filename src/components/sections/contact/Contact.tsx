@@ -59,7 +59,7 @@ export function Contact({ dict }: { dict: Dictionary }) {
         };
 
   return (
-    <section id="contact" aria-labelledby="contact-title" className="relative scroll-mt-16 overflow-hidden bg-panel">
+    <section id="contact" aria-labelledby="contact-title" className="relative scroll-mt-16 overflow-hidden bg-ink [--iso-shadow:var(--color-bg)]">
       <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-center gap-12 px-4 py-24 md:px-8 md:py-36 lg:grid-cols-12">
         <div className="flex min-w-0 flex-col gap-8 lg:col-span-8">
           <motion.h2

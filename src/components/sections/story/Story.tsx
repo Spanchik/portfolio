@@ -167,7 +167,7 @@ export function Story({ dict }: { dict: Dictionary }) {
                 className="story-step"
                 style={{ opacity: 0 }}
               >
-                <span className="mb-5 inline-block rounded-full bg-accent px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-ink uppercase">
+                <span className="mb-5 inline-block rounded-full bg-fg px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-bg uppercase">
                   {st.k}
                 </span>
                 <h2 className="font-display text-[clamp(1.8rem,3.4vw,3.4rem)] leading-[1.08] font-bold tracking-[-0.02em]">{st.title}</h2>
