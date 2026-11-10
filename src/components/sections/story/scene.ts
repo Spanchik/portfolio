@@ -83,6 +83,14 @@ const ease = (x: number) => x * x * (3 - 2 * x);
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 const bell = (x: number, c: number, w: number) => Math.exp(-(((x - c) / w) ** 2));
+/**
+ * Point on a route at `t` in 0…1. `CurvePath.getPointAt` returns null when rounding pushes
+ * the position a hair past the end of the path (and for NaN), which used to crash a frame.
+ */
+const pointOn = (path: THREE.CurvePath<THREE.Vector3>, t: number): THREE.Vector3 => {
+  const u = Number.isFinite(t) ? clamp01(t) : 0;
+  return path.getPointAt(u * 0.9995) ?? path.curves[path.curves.length - 1].getPoint(1);
+};
 
 /* ───────────── chaos objects: chunky "toy" office items in the machine's style ───────────── */
 
@@ -559,7 +567,7 @@ export function createStory(o: StoryOptions): () => void {
     raf = requestAnimationFrame(frame);
     // phones render every other frame: halves the main-thread and GPU load, the motion still reads smooth
     if (lite && now - last < 30) return;
-    const dt = Math.min(0.05, (now - last) / 1000);
+    const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
     last = now;
     if (!visible) return;
     const t = (now - born) / 1000;
@@ -705,7 +713,7 @@ export function createStory(o: StoryOptions): () => void {
         const u = (scriptT - mv.t) / mv.dur;
         mv.m.visible = on && !o.reduced && u >= 0 && u <= 1;
         if (!mv.m.visible) continue;
-        const pt = curves[mv.key].path.getPointAt(mv.rev ? 1 - u : u);
+        const pt = pointOn(curves[mv.key].path, mv.rev ? 1 - u : u);
         mv.m.position.set(pt.x, 0.38, pt.z);
         mv.m.rotation.y += dt * 3;
         if (u > 0.9) {
@@ -738,7 +746,7 @@ export function createStory(o: StoryOptions): () => void {
         const idx = (queued[p.to] = (queued[p.to] ?? -1) + 1);
         const hold = Math.max(0.2, 0.86 - idx * (0.6 / p.c.len));
         if (p.t > hold) p.t = hold;
-        const pt = p.c.path.getPointAt(p.t);
+        const pt = pointOn(p.c.path, p.t);
         p.m.position.set(pt.x, 0.3 + Math.abs(Math.sin(now / 180 + i)) * 0.25, pt.z);
         continue;
       }
@@ -748,7 +756,7 @@ export function createStory(o: StoryOptions): () => void {
         S[p.to].heat = Math.max(S[p.to].heat, 1);
         continue;
       }
-      const pt = p.c.path.getPointAt(p.t);
+      const pt = pointOn(p.c.path, p.t);
       p.m.position.set(pt.x, 0.3, pt.z);
       p.m.rotation.y += dt * 3;
     }
