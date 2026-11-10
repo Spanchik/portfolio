@@ -28,23 +28,23 @@ export const en: Dictionary = {
     breakHint: "Switch a block off: requests queue up instead of getting lost",
     offline: "offline",
     sceneLabel: "3D diagram of a typical automation architecture",
-    chaos: {
-      k: "From chaos",
-      title: "Spreadsheets, e-mails and messages — into one stream",
-      text: "Scattered documents become structured data that the system works with from then on.",
-    },
-    steps: [
-      { k: "Request", title: "“How many vacation days do I have left?”", text: "An employee writes in Telegram. The agent checks their role in code and picks the tool: the model does not decide access." },
-      { k: "Data & process", title: "The answer comes from 1C, the request goes for approval", text: "The agent reads the balance from 1C and answers in seconds. The vacation request goes to the manager by itself and comes back approved." },
+    stages: [
+      { k: "Request", title: "An employee writes in Telegram", text: "An ordinary message in a messenger, with no forms and no paper requests." },
+      { k: "Data", title: "The agent checks the role and reads the balance from 1C", text: "Access is decided by code, not by the model. The answer comes in seconds." },
+      { k: "Process", title: "The request goes for approval by itself", text: "The manager gets the request, and the system tracks deadlines and escalation." },
       { k: "System", title: "One system instead of ten spreadsheets", text: "This is a request from the first case. The systems in the cases below are built the same way." },
     ],
-    script: {
-      ask: "How many vacation days do I have left?",
-      role: "role: employee ✓",
-      tool: "tool: vacation balance",
-      balance: "1C: 14 days",
-      answer: "Balance: 14 days. File a request?",
-      approved: "Request #204 approved ✓",
+    tags: { role: "role: employee ✓", balance: "balance: 14 days", approved: "approved ✓" },
+    chat: {
+      title: "HR Assistant",
+      status: "bot · online",
+      messages: [
+        { from: "user", at: 1, text: "How many vacation days do I have left?" },
+        { from: "bot", at: 2, text: "Balance: 14 days. File a request?" },
+        { from: "user", at: 3, text: "Yes, May 12 to 18" },
+        { from: "bot", at: 3, text: "Request #204 created and sent to your manager." },
+      ],
+      approved: "Approved · document generated",
     },
   },
   machine: {
