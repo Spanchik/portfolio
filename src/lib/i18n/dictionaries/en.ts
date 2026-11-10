@@ -3,9 +3,9 @@ import type { Dictionary } from "./uk";
 
 export const en: Dictionary = {
   meta: {
-    title: "AI Solutions & Business Process Automation",
+    title: "Website development, process automation and AI agents",
     description:
-      "1C, database and API integrations, business process automation and AI agents.",
+      "I build websites, internal systems and AI agents for business. Integrations with accounting, databases and external services. Cases: an HR assistant, an HR platform, a BAS Retail to Glovo exchange.",
   },
   topbar: {
     langNav: "Site language",
@@ -15,10 +15,10 @@ export const en: Dictionary = {
     contact: "Discuss a task",
   },
   hero: {
-    title: "I take routine work off your team.",
-    subtitle: "I connect 1C, databases and APIs into one system and put AI agents on the repetitive requests: statements, approvals, reports.",
+    title: "I build websites and systems that work for\u00a0you.",
+    subtitle: "I develop websites, internal systems and AI agents and connect them to your data: accounting, databases, external services.",
     portraitAlt: "Developer portrait",
-    titleAccent: "routine",
+    titleAccent: "work",
     ctaPrimary: "Discuss a task",
     ctaSecondary: "See the cases",
   },
@@ -28,23 +28,23 @@ export const en: Dictionary = {
     breakHint: "Switch a block off: requests queue up instead of getting lost",
     offline: "offline",
     sceneLabel: "3D diagram of a typical automation architecture",
-    chaos: {
-      k: "From chaos",
-      title: "Spreadsheets, e-mails and messages — into one stream",
-      text: "Scattered documents become structured data that the system works with from then on.",
-    },
-    steps: [
-      { k: "Request", title: "“How many vacation days do I have left?”", text: "An employee writes in Telegram. The agent checks their role in code and picks the tool: the model does not decide access." },
-      { k: "Data & process", title: "The answer comes from 1C, the request goes for approval", text: "The agent reads the balance from 1C and answers in seconds. The vacation request goes to the manager by itself and comes back approved." },
-      { k: "System", title: "One system instead of ten spreadsheets", text: "This is a request from the first case. All three projects below are built the same way." },
+    stages: [
+      { k: "Request", title: "An employee writes in Telegram", text: "An ordinary message in a messenger, with no forms and no paper requests." },
+      { k: "Data", title: "The agent checks the role and reads the balance from 1C", text: "Access is decided by code, not by the model. The answer comes in seconds." },
+      { k: "Process", title: "The request goes for approval by itself", text: "The manager gets the request, and the system tracks deadlines and escalation." },
+      { k: "System", title: "One system instead of ten spreadsheets", text: "This is a request from the first case. The systems in the cases below are built the same way." },
     ],
-    script: {
-      ask: "How many vacation days do I have left?",
-      role: "role: employee ✓",
-      tool: "tool: vacation balance",
-      balance: "1C: 14 days",
-      answer: "Balance: 14 days. File a request?",
-      approved: "Request #204 approved ✓",
+    tags: { role: "role: employee ✓", balance: "balance: 14 days", approved: "approved ✓" },
+    chat: {
+      title: "HR Assistant",
+      status: "bot · online",
+      messages: [
+        { from: "user", at: 1, text: "How many vacation days do I have left?" },
+        { from: "bot", at: 2, text: "Balance: 14 days. File a request?" },
+        { from: "user", at: 3, text: "Yes, May 12 to 18" },
+        { from: "bot", at: 3, text: "Request #204 created and sent to your manager." },
+      ],
+      approved: "Approved · document generated",
     },
   },
   machine: {
@@ -65,12 +65,18 @@ export const en: Dictionary = {
   },
   about: {
     title: "About me",
-    text: "I automate internal processes for companies that run on 1C. I take the whole job: from the integration with the accounting database to the AI agent an employee messages in Telegram. I work solo: from mapping the process to deployment and support. Recent projects: an HR assistant with 25+ tools, an HR platform synchronised with 1C, and a BAS Retail to Glovo exchange for 32 stores. In my systems access rights are checked by code, not by the model.",
+    text: "I build websites, internal systems and AI agents for business. I work solo, with AI tools in development: that gives speed, and I review every change myself. I take the whole job, from mapping the process to deployment and support, and integrate with what the company already runs: 1C/BAS, databases, external services.",
+    servicesLabel: "What I do",
+    services: [
+      { t: "Websites and web apps", d: "Landing pages, portfolios, customer areas and internal portals: from design to deployment." },
+      { t: "Internal systems and integrations", d: "Data exchange between 1C/BAS, databases and external services, admin panels and reports." },
+      { t: "AI agents and bots", d: "Assistants in Telegram and on the web that answer requests and take actions in your systems." },
+    ],
   },
   cases: casesEn,
   contact: {
-    title: "Let's talk about your automation",
-    text: "Tell me where your team loses time on routine work — I'll suggest what can be automated.",
+    title: "Let's talk about your task",
+    text: "Tell me what you need: a website, an internal system or a process automated. I'll suggest a solution and estimate the timeline.",
     write: "Message me on Telegram",
     copy: "Copy address",
     copied: "Copied",

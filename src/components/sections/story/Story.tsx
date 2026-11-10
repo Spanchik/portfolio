@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowDown, ArrowUpRight, Check } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uk";
 import { cn } from "@/lib/cn";
 import { IsoMachine } from "../hero/IsoMachine";
@@ -10,10 +11,55 @@ import type { StationKey } from "./scene";
 
 const bare = (w: string) => w.replace(/[.,!?]/g, "");
 
+type Chat = Dictionary["story"]["chat"];
+
+/** The conversation behind the scene: each message appears on its stage of the scroll. */
+function StoryChat({ chat, stage, reduced }: { chat: Chat; stage: number; reduced: boolean }) {
+  const messages = chat.messages.filter((m) => m.at <= stage);
+  return (
+    <div className="w-full max-w-[330px] overflow-hidden rounded-[26px] border-[6px] border-ink bg-paper text-ink shadow-[8px_8px_0_var(--color-accent)]">
+      <div className="flex items-center gap-3 border-b-[1.5px] border-ink bg-white px-3.5 py-2.5">
+        <span className="flex size-8 items-center justify-center rounded-full border-[1.5px] border-ink bg-accent font-display text-[10px] font-bold">HR</span>
+        <span className="flex flex-col leading-tight">
+          <b className="font-display text-xs">{chat.title}</b>
+          <span className="text-[12px] text-ink/60">{chat.status}</span>
+        </span>
+      </div>
+      <div className="flex h-[150px] flex-col justify-end gap-2 overflow-hidden p-3 text-[13px] leading-snug md:h-[min(276px,31vh)]">
+        {messages.map((m) => (
+          <motion.p
+            key={m.text}
+            initial={reduced ? false : { opacity: 0, y: 10, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.25 }}
+            className={cn(
+              "max-w-[88%] shrink-0 rounded-2xl border-[1.5px] border-ink px-3 py-2",
+              m.from === "user" ? "self-end rounded-br-sm bg-bg text-fg" : "self-start rounded-bl-sm bg-white",
+            )}
+          >
+            {m.text}
+          </motion.p>
+        ))}
+        {stage >= 4 && (
+          <motion.span
+            initial={reduced ? false : { opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex shrink-0 items-center gap-1.5 self-center rounded-full border-[1.5px] border-ink bg-accent px-3 py-1.5 text-[12px] font-semibold"
+          >
+            <Check size={13} strokeWidth={3} />
+            {chat.approved}
+          </motion.span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /**
- * Hero + scroll story. A pinned 3D scene (three.js, lazy-loaded) is driven by scroll
- * through 6 steps; the copy for each step cross-fades on the left. Without WebGL the
- * SVG isometric machine is shown instead and only the first step is rendered.
+ * Hero + scroll story. A pinned 3D scene (three.js, lazy-loaded) is driven by scroll:
+ * the prologue assembles the machine, then one real request is followed through
+ * it. On the left a chat shows the conversation; each message lights up its block on the
+ * right. Without WebGL the SVG isometric machine is shown and only the hero is rendered.
  */
 export function Story({ dict }: { dict: Dictionary }) {
   const trackRef = useRef<HTMLElement>(null);
@@ -26,14 +72,14 @@ export function Story({ dict }: { dict: Dictionary }) {
   const railRefs = useRef<(HTMLElement | null)[]>([]);
   const reduced = usePrefersReducedMotion();
   const [fallback, setFallback] = useState(false);
+  /** 0 = hero, 1–3 = the request's stages, 4 = the whole system. Set by the scene. */
+  const [stage, setStage] = useState(0);
 
   const s = dict.machine.subs;
-  const subs: Record<StationKey, string> = {
-    tg: s.tg, web: s.web, api: s.api, rbac: s.rbac, agent: s.agent, tools: s.tools, c1: s.c1, db: s.sheets, wf: s.approval,
-  };
+  const subs: Record<StationKey, string> = { tg: s.tg, web: s.web, rbac: s.rbac, agent: s.agent, c1: s.c1, db: s.sheets, wf: s.approval };
   const subsKey = JSON.stringify(subs);
+  const tagsKey = JSON.stringify(dict.story.tags);
   const offlineLabel = dict.story.offline;
-  const scriptKey = JSON.stringify(dict.story.script);
 
   useEffect(() => {
     let dispose: (() => void) | undefined;
@@ -53,7 +99,8 @@ export function Story({ dict }: { dict: Dictionary }) {
             stepEls: stepRefs.current.filter(Boolean) as HTMLElement[],
             railEls: railRefs.current.filter(Boolean) as HTMLElement[],
             subs: JSON.parse(subsKey),
-            script: JSON.parse(scriptKey),
+            tags: JSON.parse(tagsKey),
+            onStage: setStage,
             reduced,
           });
         } catch {
@@ -65,11 +112,14 @@ export function Story({ dict }: { dict: Dictionary }) {
       cancelled = true;
       dispose?.();
     };
-  }, [reduced, subsKey, scriptKey, offlineLabel]);
+  }, [reduced, subsKey, tagsKey, offlineLabel]);
 
   const words = dict.hero.title.split(" ");
-  // prologue step ("from chaos") + the architecture walk-through
-  const steps = [dict.story.chaos, ...dict.story.steps];
+  const stages = dict.story.stages;
+  // the caption shown next to the chat; during the hero the first one is kept ready
+  const shown = Math.min(stages.length, Math.max(1, stage));
+  const primary =
+    "inline-flex h-12 items-center gap-2 rounded-full bg-fg px-6 text-sm font-semibold text-bg btn-iso hover:bg-accent hover:text-ink";
 
   return (
     <section
@@ -112,10 +162,10 @@ export function Story({ dict }: { dict: Dictionary }) {
         {/* readability veil under the copy */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(31,59,255,.95)_0%,rgba(31,59,255,.7)_35%,rgba(31,59,255,0)_60%)] md:bg-[linear-gradient(90deg,rgba(31,59,255,.92)_0%,rgba(31,59,255,.75)_30%,rgba(31,59,255,0)_52%)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,rgba(31,59,255,.96)_0%,rgba(31,59,255,.85)_42%,rgba(31,59,255,0)_62%)] md:bg-[linear-gradient(90deg,rgba(31,59,255,.92)_0%,rgba(31,59,255,.75)_30%,rgba(31,59,255,0)_52%)]"
         />
 
-        <div className="pointer-events-none absolute inset-x-4 bottom-[10vh] md:inset-x-auto md:bottom-auto md:left-8 md:top-1/2 md:w-[min(560px,42vw)] lg:left-[max(2rem,calc((100vw-1360px)/2+2rem))]">
+        <div className="pointer-events-none absolute inset-x-4 bottom-[5vh] md:inset-x-auto md:bottom-auto md:left-8 md:top-[calc(50%+1.75rem)] md:w-[min(720px,46vw)] lg:left-[max(2rem,calc((100vw-1360px)/2+2rem))]">
           {/* step 0 — hero copy */}
           <div
             ref={(el) => {
@@ -124,7 +174,7 @@ export function Story({ dict }: { dict: Dictionary }) {
             className="story-step"
             style={{ opacity: 1 }}
           >
-            <h1 id="hero-title" className="font-display text-[clamp(2.3rem,4.6vw,4.9rem)] leading-[1.05] font-bold tracking-[-0.02em]">
+            <h1 id="hero-title" className="font-display text-[clamp(2.2rem,3.9vw,4.4rem)] leading-[1.08] font-bold tracking-[-0.02em] text-balance">
               {words.map((w, i) => (
                 <span key={i}>
                   {bare(w) === dict.hero.titleAccent ? <em className="bg-fg px-[0.12em] text-bg not-italic">{w}</em> : w}
@@ -132,12 +182,9 @@ export function Story({ dict }: { dict: Dictionary }) {
                 </span>
               ))}
             </h1>
-            <p className="mt-6 max-w-[36ch] text-base leading-relaxed text-fg/90 md:text-lg">{dict.hero.subtitle}</p>
+            <p className="mt-6 max-w-[46ch] text-base leading-relaxed text-fg/90 md:text-lg">{dict.hero.subtitle}</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <a
-                href="#contact"
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-fg px-6 text-sm font-semibold text-bg btn-iso hover:bg-accent hover:text-ink"
-              >
+              <a href="#contact" className={primary}>
                 {dict.hero.ctaPrimary}
                 <ArrowUpRight size={17} strokeWidth={2.2} />
               </a>
@@ -156,38 +203,49 @@ export function Story({ dict }: { dict: Dictionary }) {
             )}
           </div>
 
-          {!fallback &&
-            steps.map((st, i) => (
-              <div
-                key={st.k}
-                ref={(el) => {
-                  stepRefs.current[i + 1] = el;
-                }}
-                aria-hidden
-                className="story-step"
-                style={{ opacity: 0 }}
-              >
-                <span className="mb-5 inline-block rounded-full bg-accent px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-ink uppercase">
-                  {st.k}
-                </span>
-                <h2 className="font-display text-[clamp(1.8rem,3.4vw,3.4rem)] leading-[1.08] font-bold tracking-[-0.02em]">{st.title}</h2>
-                <p className="mt-5 max-w-[36ch] text-base leading-relaxed text-fg/90 md:text-lg">{st.text}</p>
-                {i === steps.length - 1 && (
-                  <a
-                    href="#cases"
-                    className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-fg px-6 text-sm font-semibold text-bg btn-iso hover:bg-accent hover:text-ink"
-                  >
-                    {dict.story.cta}
-                    <ArrowDown size={17} strokeWidth={2.2} />
-                  </a>
-                )}
+          {/* steps 1–4 — one block: the caption of the current stage above the live chat */}
+          {!fallback && (
+            <div
+              ref={(el) => {
+                stepRefs.current[1] = el;
+              }}
+              aria-hidden
+              className="story-step"
+              style={{ opacity: 0 }}
+            >
+              {/* captions share one grid cell, so the chat below never jumps */}
+              <div className="mb-4 grid max-w-[560px] md:mb-6">
+                {stages.map((st, i) => {
+                  const on = i + 1 === shown;
+                  return (
+                    <div
+                      key={st.k}
+                      aria-hidden={!on}
+                      className={cn("col-start-1 row-start-1 self-end transition-opacity duration-300", on ? "opacity-100" : "pointer-events-none opacity-0")}
+                    >
+                      <span className="mb-3 inline-block rounded-full bg-fg px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-bg uppercase md:mb-4">
+                        {st.k}
+                      </span>
+                      <h2 className="font-display text-[clamp(1.35rem,2.5vw,2.4rem)] leading-[1.1] font-bold tracking-[-0.02em]">{st.title}</h2>
+                      <p className="mt-3 hidden max-w-[40ch] leading-relaxed text-fg/90 md:block">{st.text}</p>
+                      {i === stages.length - 1 && (
+                        <a href="#cases" tabIndex={on ? undefined : -1} className={cn(primary, "mt-4 md:mt-5")}>
+                          {dict.story.cta}
+                          <ArrowDown size={17} strokeWidth={2.2} />
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+              <StoryChat chat={dict.story.chat} stage={stage} reduced={reduced} />
+            </div>
+          )}
         </div>
 
         {!fallback && (
           <div aria-hidden className="absolute top-1/2 right-4 hidden -translate-y-1/2 flex-col gap-2.5 md:right-8 md:flex">
-            {[0, ...steps.map((_, i) => i + 1)].map((i) => (
+            {[0, ...stages.map((_, i) => i + 1)].map((i) => (
               <span key={i} className="relative h-7 w-1 overflow-hidden rounded-full bg-fg/30">
                 <i
                   ref={(el) => {
@@ -200,12 +258,8 @@ export function Story({ dict }: { dict: Dictionary }) {
           </div>
         )}
       </div>
-      {/* cursor packet (fine pointers only; positioned by the scene) */}
-      <div
-        ref={cursorRef}
-        aria-hidden
-        className="pointer-events-none fixed top-0 left-0 z-30 -mt-1.5 -ml-1.5 size-3 bg-accent opacity-0 shadow-[0_0_0_2px_#fff] transition-opacity duration-150"
-      />
+      {/* legacy cursor node, kept hidden (the scene still receives it) */}
+      <div ref={cursorRef} aria-hidden className="pointer-events-none fixed top-0 left-0 size-0 opacity-0" />
     </section>
   );
 }

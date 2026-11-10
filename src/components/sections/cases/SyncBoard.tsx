@@ -35,7 +35,7 @@ export function SyncBoard({ dict }: { dict: Sync }) {
             <span className="size-2.5 rounded-full border border-ink bg-accent" />
             <span className="size-2.5 rounded-full border border-ink" />
             <span className="size-2.5 rounded-full border border-ink" />
-            <span className="ml-3 truncate rounded-full border-[1.5px] border-ink/25 bg-white px-3 py-0.5 text-[11px] font-medium text-ink/60">{dict.url}</span>
+            <span className="ml-3 truncate rounded-full border-[1.5px] border-ink/25 bg-white px-3 py-0.5 text-[12.5px] font-medium text-ink/60">{dict.url}</span>
           </div>
 
           <div className="flex flex-col gap-3 p-3 sm:pb-12">
@@ -43,7 +43,7 @@ export function SyncBoard({ dict }: { dict: Sync }) {
             <div className="grid grid-cols-3 gap-2">
               {dict.kpis.map((k, i) => (
                 <p key={k.label} className={cn("rounded-xl border-[1.5px] border-ink px-2.5 py-2 leading-tight", i === 2 && "bg-accent")}>
-                  <span className="block truncate text-[10px] font-semibold text-ink/65">{k.label}</span>
+                  <span className="block truncate text-[11.5px] font-semibold text-ink/65">{k.label}</span>
                   <b className="font-display text-base sm:text-lg">{k.value}</b>
                 </p>
               ))}
@@ -51,7 +51,7 @@ export function SyncBoard({ dict }: { dict: Sync }) {
 
             {/* catalogue */}
             <div className="rounded-xl border-[1.5px] border-ink">
-              <p className="grid grid-cols-[1fr_4.5rem_4rem_4.5rem] gap-2 border-b-[1.5px] border-ink bg-paper px-3 py-2 text-[10px] font-semibold tracking-[0.06em] text-ink/65 uppercase">
+              <p className="grid grid-cols-[1fr_3.4rem_2.4rem_2.6rem] sm:grid-cols-[1fr_5rem_4.5rem_5rem] gap-2 border-b-[1.5px] border-ink bg-paper px-3 py-2 text-[11.5px] font-semibold tracking-[0.06em] text-ink/65 uppercase">
                 {dict.columns.map((c, i) => (
                   <span key={c} className={cn("truncate", i > 0 && "text-right")}>
                     {c}
@@ -66,7 +66,7 @@ export function SyncBoard({ dict }: { dict: Sync }) {
                   <p
                     key={r.name}
                     className={cn(
-                      "grid grid-cols-[1fr_4.5rem_4rem_4.5rem] items-center gap-2 px-3 py-2 text-xs",
+                      "grid grid-cols-[1fr_3.4rem_2.4rem_2.6rem] sm:grid-cols-[1fr_5rem_4.5rem_5rem] items-center gap-2 px-3 py-2 text-[13px]",
                       i > 0 && "border-t border-ink/15",
                     )}
                   >
@@ -94,7 +94,7 @@ export function SyncBoard({ dict }: { dict: Sync }) {
             </div>
 
             {/* last sync line */}
-            <p className="flex items-center gap-2 px-1 text-[11px] font-medium text-ink/60">
+            <p className="flex items-center gap-2 px-1 text-[12.5px] font-medium text-ink/60">
               <RefreshCw size={12} strokeWidth={2.4} className={cn(!reduced && inView && "animate-[spin_3s_linear_infinite]")} />
               {dict.synced}
             </p>
@@ -108,7 +108,7 @@ export function SyncBoard({ dict }: { dict: Sync }) {
               initial={reduced ? false : { opacity: 0, y: 14, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute -top-5 right-2 z-10 flex rotate-2 items-center gap-2 rounded-full border-[1.5px] border-ink bg-accent px-3.5 py-2 text-xs font-bold text-ink shadow-[4px_4px_0_var(--color-ink)] sm:-right-4"
+              className="absolute -top-5 right-2 z-10 flex rotate-2 items-center gap-2 rounded-full border-[1.5px] border-ink bg-accent px-3.5 py-2 text-[13px] font-bold text-ink shadow-[4px_4px_0_var(--color-ink)] sm:-right-4"
             >
               <Check size={14} strokeWidth={3} />
               {dict.toast}
@@ -124,16 +124,16 @@ export function SyncBoard({ dict }: { dict: Sync }) {
               animate={{ opacity: 1, x: 0, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35 }}
-              className="absolute -right-3 -bottom-9 z-10 hidden w-[210px] rotate-2 rounded-2xl border-[1.5px] border-ink bg-white p-3 text-ink shadow-[6px_6px_0_var(--color-accent)] sm:block"
+              className="absolute -right-3 -bottom-9 z-10 hidden w-[226px] rotate-2 rounded-2xl border-[1.5px] border-ink bg-white p-3 text-ink shadow-[6px_6px_0_var(--color-accent)] sm:block"
             >
-              <p className="flex items-center gap-1.5 font-display text-[10px] font-bold tracking-[0.04em] uppercase">
+              <p className="flex items-center gap-1.5 font-display text-[11.5px] font-bold tracking-[0.04em] uppercase">
                 <ShoppingBag size={14} strokeWidth={2.2} />
                 {dict.order.title}
               </p>
-              <p className="mt-1 text-[11px] text-ink/60">{dict.order.meta}</p>
+              <p className="mt-1 text-[12.5px] text-ink/60">{dict.order.meta}</p>
               <p
                 className={cn(
-                  "mt-2 flex w-fit items-center gap-1.5 rounded-full border-[1.5px] border-ink px-2.5 py-1 text-[11px] font-bold transition-colors duration-300",
+                  "mt-2 flex w-fit items-center gap-1.5 rounded-full border-[1.5px] border-ink px-2.5 py-1 text-[12.5px] font-bold transition-colors duration-300",
                   f >= 3 ? "bg-accent" : "bg-paper",
                 )}
               >
