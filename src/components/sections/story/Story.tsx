@@ -33,6 +33,7 @@ export function Story({ dict }: { dict: Dictionary }) {
   };
   const subsKey = JSON.stringify(subs);
   const offlineLabel = dict.story.offline;
+  const scriptKey = JSON.stringify(dict.story.script);
 
   useEffect(() => {
     let dispose: (() => void) | undefined;
@@ -52,6 +53,7 @@ export function Story({ dict }: { dict: Dictionary }) {
             stepEls: stepRefs.current.filter(Boolean) as HTMLElement[],
             railEls: railRefs.current.filter(Boolean) as HTMLElement[],
             subs: JSON.parse(subsKey),
+            script: JSON.parse(scriptKey),
             reduced,
           });
         } catch {
@@ -63,7 +65,7 @@ export function Story({ dict }: { dict: Dictionary }) {
       cancelled = true;
       dispose?.();
     };
-  }, [reduced, subsKey, offlineLabel]);
+  }, [reduced, subsKey, scriptKey, offlineLabel]);
 
   const words = dict.hero.title.split(" ");
   // prologue step ("from chaos") + the architecture walk-through

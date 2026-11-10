@@ -34,10 +34,18 @@ export const en: Dictionary = {
       text: "Scattered documents become structured data that the system works with from then on.",
     },
     steps: [
-      { k: "Request", title: "An employee writes, the agent works out what to do", text: "The request comes from Telegram, the web portal or an API. The agent picks the tool, while access rights are checked by code, not by the model." },
-      { k: "Data & process", title: "Data comes from 1C, then the process runs itself", text: "Integrations with 1C and databases, with no manual copying. Approvals, notifications and reports happen automatically." },
-      { k: "System", title: "One system instead of ten spreadsheets", text: "This is how the three projects below are built." },
+      { k: "Request", title: "“How many vacation days do I have left?”", text: "An employee writes in Telegram. The agent checks their role in code and picks the tool: the model does not decide access." },
+      { k: "Data & process", title: "The answer comes from 1C, the request goes for approval", text: "The agent reads the balance from 1C and answers in seconds. The vacation request goes to the manager by itself and comes back approved." },
+      { k: "System", title: "One system instead of ten spreadsheets", text: "This is a request from the first case. All three projects below are built the same way." },
     ],
+    script: {
+      ask: "How many vacation days do I have left?",
+      role: "role: employee ✓",
+      tool: "tool: vacation balance",
+      balance: "1C: 14 days",
+      answer: "Balance: 14 days. File a request?",
+      approved: "Request #204 approved ✓",
+    },
   },
   machine: {
     label: "Isometric diagram of a typical automation architecture",
