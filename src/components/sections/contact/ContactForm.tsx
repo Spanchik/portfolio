@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Mail, Send } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uk";
 import { site } from "@/lib/site";
 
 type FormDict = Dictionary["contact"]["form"];
 
 /**
- * Short brief form. There is no backend: on submit the visitor's own Telegram or mail
- * client opens with the message already written, addressed to the site owner. Nothing
- * is stored or sent by the page itself.
+ * Short brief form, drawn straight on the dark section (no card). There is no backend:
+ * on submit the visitor's own Telegram or mail client opens with the message already
+ * written, addressed to the site owner. Nothing is stored or sent by the page itself.
  */
 export function ContactForm({ dict }: { dict: FormDict }) {
   const [name, setName] = useState("");
@@ -30,18 +30,16 @@ export function ContactForm({ dict }: { dict: FormDict }) {
     }
   };
 
+  // underlined fields: the form reads as part of the section, not as a widget pasted onto it
   const field =
-    "w-full rounded-xl border-[1.5px] border-ink/25 bg-paper px-3.5 text-[15px] text-ink placeholder:text-ink/40 focus:border-bg focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bg";
-  const label = "mb-1.5 block text-[13px] font-semibold";
+    "w-full rounded-none border-0 border-b-[1.5px] border-fg/35 bg-transparent px-0 text-[17px] text-fg placeholder:text-fg/35 transition-colors hover:border-fg/60 focus:border-accent focus:outline-none";
+  const label = "block text-xs font-semibold tracking-[0.12em] text-muted uppercase";
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="flex flex-col gap-4 rounded-2xl border-[1.5px] border-ink bg-white p-5 text-ink shadow-[8px_8px_0_var(--color-bg)] md:p-7"
-    >
-      <p className="font-display text-lg font-medium tracking-[-0.01em] md:text-xl">{dict.title}</p>
+    <form onSubmit={onSubmit} className="flex flex-col gap-7">
+      <p className="font-display text-xl font-medium tracking-[-0.01em] md:text-2xl">{dict.title}</p>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 sm:gap-8">
         <label>
           <span className={label}>{dict.name}</span>
           <input value={name} onChange={(e) => setName(e.target.value)} name="name" autoComplete="name" maxLength={80} className={`${field} h-12`} />
@@ -68,33 +66,32 @@ export function ContactForm({ dict }: { dict: FormDict }) {
           required
           minLength={10}
           maxLength={1500}
-          rows={4}
+          rows={3}
           placeholder={dict.taskPlaceholder}
-          className={`${field} resize-y py-3 leading-relaxed`}
+          className={`${field} mt-1 resize-y py-3 leading-relaxed`}
         />
       </label>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+        <button
+          type="submit"
+          value={telegram ? "tg" : "mail"}
+          className="btn-iso inline-flex h-14 items-center justify-center gap-2 rounded-full bg-fg px-7 font-display text-sm font-bold text-ink hover:bg-accent"
+        >
+          {telegram ? dict.sendTg : dict.sendMail}
+          <ArrowUpRight size={18} strokeWidth={2.2} />
+        </button>
         {telegram && (
           <button
             type="submit"
-            value="tg"
-            className="btn-iso inline-flex h-12 items-center gap-2 rounded-full bg-bg px-5 text-sm font-semibold text-fg hover:bg-accent hover:text-ink"
+            value="mail"
+            className="inline-flex h-11 items-center justify-center text-sm font-semibold underline decoration-fg/40 decoration-2 underline-offset-4 hover:decoration-accent"
           >
-            <Send size={16} strokeWidth={2.2} />
-            {dict.sendTg}
+            {dict.sendMail}
           </button>
         )}
-        <button
-          type="submit"
-          value="mail"
-          className="btn-iso inline-flex h-12 items-center gap-2 rounded-full border-[1.5px] border-ink px-5 text-sm font-semibold hover:bg-ink hover:text-fg"
-        >
-          <Mail size={16} strokeWidth={2.2} />
-          {dict.sendMail}
-        </button>
       </div>
-      <p className="text-[13px] leading-relaxed text-ink/60">{dict.note}</p>
+      <p className="max-w-[52ch] text-[13px] leading-relaxed text-fg/60">{dict.note}</p>
     </form>
   );
 }

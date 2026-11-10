@@ -30,8 +30,8 @@ export function About({ dict, lang }: { dict: Dictionary; lang: "uk" | "en" }) {
       aria-labelledby="about-title"
       className="paper-grid relative scroll-mt-16 overflow-hidden bg-paper text-ink selection:bg-bg selection:text-fg"
     >
-      <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-center gap-12 px-4 py-20 md:px-8 md:py-32 lg:grid-cols-12 lg:gap-10">
-        <motion.div {...reveal()} className="relative mx-auto w-full max-w-[460px] lg:col-span-5">
+      <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-center gap-8 px-4 py-14 md:gap-12 md:px-8 md:py-32 lg:grid-cols-12 lg:gap-10">
+        <motion.div {...reveal()} className="relative w-full max-w-[210px] sm:max-w-[320px] lg:mx-auto lg:max-w-[460px] lg:col-span-5">
           {/* offset "extrusion", echoing the isometric blocks */}
           <div aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl bg-bg sm:translate-x-4 sm:translate-y-4" />
           <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border-[1.5px] border-ink bg-ink">

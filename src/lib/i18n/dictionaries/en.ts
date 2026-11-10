@@ -79,10 +79,11 @@ export const en: Dictionary = {
     title: "Let's talk about your task",
     text: "Tell me what you need: a website, an internal system or a process automated. I'll suggest a solution and estimate the timeline.",
     write: "Message me on Telegram",
+    direct: "Or directly",
     copy: "Copy address",
     copied: "Copied",
     form: {
-      title: "Or describe the task here",
+      title: "Describe the task",
       name: "Name",
       contact: "How to reach you",
       contactHint: "Telegram, phone or e-mail",

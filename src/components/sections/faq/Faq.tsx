@@ -5,7 +5,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/uk";
 export function Faq({ dict }: { dict: Dictionary }) {
   return (
     <section id="faq" aria-labelledby="faq-title" className="relative scroll-mt-16">
-      <div className="mx-auto grid max-w-[1360px] grid-cols-1 gap-10 px-4 py-20 md:px-8 md:py-28 lg:grid-cols-12 lg:gap-12">
+      <div className="mx-auto grid max-w-[1360px] grid-cols-1 gap-8 px-4 py-14 md:gap-10 md:px-8 md:py-28 lg:grid-cols-12 lg:gap-12">
         <h2
           id="faq-title"
           className="font-display text-[clamp(1.8rem,3.9vw,3.5rem)] leading-[1.1] font-medium tracking-[-0.02em] lg:col-span-4"

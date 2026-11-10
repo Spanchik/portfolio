@@ -46,7 +46,7 @@ export function PhoneChat({ dict }: { dict: Chat }) {
   const ring = 2 * Math.PI * 26;
 
   return (
-    <div ref={ref} role="img" aria-label={dict.label} className="relative mx-auto h-[640px] w-full max-w-[640px]">
+    <div ref={ref} role="img" aria-label={dict.label} className="relative mx-auto h-[580px] w-full max-w-[640px] sm:h-[640px]">
       <div aria-hidden>
         {/* phone */}
         <div className="absolute top-0 left-1/2 flex h-[560px] w-[min(280px,78vw)] -translate-x-1/2 flex-col overflow-hidden rounded-[40px] border-[10px] border-ink bg-paper text-ink shadow-[12px_12px_0_var(--color-accent)]">

@@ -2,6 +2,7 @@ export const casesUk = {
   eyebrow: "Кейс",
   more: "Показати все",
   less: "Згорнути",
+  how: "Як це зроблено",
   labels: { task: "Задача", solution: "Рішення", result: "Результат", stack: "Стек" },
   /** Shown under the metric tiles while the figures are placeholders. Set to "" once real numbers are in. */
   metricsNote: "Орієнтовні показники, уточнюються",
