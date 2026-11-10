@@ -125,7 +125,7 @@ export function Contact({ dict }: { dict: Dictionary }) {
           {...reveal(0.15)}
           className="mx-auto w-full max-w-[220px] lg:col-span-4 lg:max-w-[340px]"
         >
-          <svg viewBox="-110 -110 220 200" className={reduced ? "w-full" : "w-full animate-[float_6s_ease-in-out_infinite]"}>
+          <svg viewBox="-104 -96 208 195" className={reduced ? "w-full" : "w-full animate-[float_6s_ease-in-out_infinite]"}>
             {CUBES.map((c, i) => (
               <CubeShape key={i} c={c} />
             ))}
