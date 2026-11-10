@@ -7,6 +7,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/uk";
 import { site } from "@/lib/site";
 import { pts } from "../hero/iso";
 import { usePrefersReducedMotion } from "../hero/useStreamControls";
+import { ContactForm } from "./ContactForm";
 
 const EASE = [0.2, 0.7, 0.2, 1] as const;
 
@@ -60,12 +61,12 @@ export function Contact({ dict }: { dict: Dictionary }) {
 
   return (
     <section id="contact" aria-labelledby="contact-title" className="relative scroll-mt-16 overflow-hidden bg-ink [--iso-shadow:var(--color-bg)]">
-      <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-center gap-12 px-4 py-24 md:px-8 md:py-36 lg:grid-cols-12">
-        <div className="flex min-w-0 flex-col gap-8 lg:col-span-8">
+      <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-start gap-12 px-4 py-20 md:px-8 md:py-28 lg:grid-cols-12 lg:gap-10">
+        <div className="flex min-w-0 flex-col gap-7 lg:col-span-6">
           <motion.h2
             {...reveal()}
             id="contact-title"
-            className="max-w-[14ch] font-display text-[clamp(1.85rem,5.4vw,5.2rem)] leading-[1.05] font-bold tracking-[-0.02em]"
+            className="max-w-[14ch] font-display text-[clamp(1.85rem,4.4vw,4.2rem)] leading-[1.05] font-bold tracking-[-0.02em]"
           >
             {dict.contact.title}
           </motion.h2>
@@ -76,7 +77,7 @@ export function Contact({ dict }: { dict: Dictionary }) {
           <motion.div {...reveal(0.2)} className="flex min-w-0 items-center gap-3">
             <a
               href={`mailto:${email}`}
-              className="group min-w-0 truncate inline-flex min-h-10 items-center font-display text-[clamp(0.85rem,2.7vw,2.4rem)] font-bold tracking-[-0.02em] underline decoration-fg/40 decoration-2 underline-offset-[0.18em] hover:decoration-accent"
+              className="group min-w-0 truncate inline-flex min-h-10 items-center font-display text-[clamp(0.85rem,2.1vw,1.9rem)] font-bold tracking-[-0.02em] underline decoration-fg/40 decoration-2 underline-offset-[0.18em] hover:decoration-accent"
             >
               {email}
             </a>
@@ -95,13 +96,13 @@ export function Contact({ dict }: { dict: Dictionary }) {
           </motion.div>
 
           <motion.div {...reveal(0.3)} className="flex flex-wrap gap-3">
-            {/* one primary action: Telegram when set, otherwise e-mail (the address itself is above) */}
+            {/* direct links; the primary action of the section is the form on the right */}
             {telegram && (
               <a
                 href={`https://t.me/${telegram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-14 items-center gap-2 rounded-full bg-fg px-7 font-display text-sm font-bold text-bg btn-iso hover:bg-accent hover:text-ink"
+                className="inline-flex h-12 items-center gap-2 rounded-full border-[1.5px] border-fg px-6 font-display text-sm font-bold btn-iso hover:bg-fg hover:text-bg"
               >
                 {dict.contact.write}
                 <ArrowUpRight size={18} strokeWidth={2.2} />
@@ -112,24 +113,24 @@ export function Contact({ dict }: { dict: Dictionary }) {
                 href={github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-14 items-center gap-2 rounded-full border-[1.5px] border-fg px-7 font-display text-sm font-bold btn-iso hover:bg-fg hover:text-bg"
+                className="inline-flex h-12 items-center gap-2 rounded-full border-[1.5px] border-fg px-6 font-display text-sm font-bold btn-iso hover:bg-fg hover:text-bg"
               >
                 GitHub <ArrowUpRight size={18} strokeWidth={2.2} />
               </a>
             )}
           </motion.div>
+
+          <motion.div aria-hidden {...reveal(0.35)} className="hidden w-full max-w-[210px] lg:block">
+            <svg viewBox="-104 -96 208 195" className={reduced ? "w-full" : "w-full animate-[float_6s_ease-in-out_infinite]"}>
+              {CUBES.map((c, i) => (
+                <CubeShape key={i} c={c} />
+              ))}
+            </svg>
+          </motion.div>
         </div>
 
-        <motion.div
-          aria-hidden
-          {...reveal(0.15)}
-          className="mx-auto w-full max-w-[220px] lg:col-span-4 lg:max-w-[340px]"
-        >
-          <svg viewBox="-104 -96 208 195" className={reduced ? "w-full" : "w-full animate-[float_6s_ease-in-out_infinite]"}>
-            {CUBES.map((c, i) => (
-              <CubeShape key={i} c={c} />
-            ))}
-          </svg>
+        <motion.div {...reveal(0.15)} className="min-w-0 lg:col-span-6">
+          <ContactForm dict={dict.contact.form} />
         </motion.div>
       </div>
     </section>

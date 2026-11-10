@@ -12,6 +12,7 @@ export const en: Dictionary = {
     mainNav: "Site sections",
     cases: "Cases",
     about: "About",
+    faq: "FAQ",
     contact: "Discuss a task",
   },
   hero: {
@@ -80,6 +81,28 @@ export const en: Dictionary = {
     write: "Message me on Telegram",
     copy: "Copy address",
     copied: "Copied",
+    form: {
+      title: "Or describe the task here",
+      name: "Name",
+      contact: "How to reach you",
+      contactHint: "Telegram, phone or e-mail",
+      task: "What needs to be done",
+      taskPlaceholder: "For example: a bot for vacation requests with data from 1C",
+      sendTg: "Send via Telegram",
+      sendMail: "Send by e-mail",
+      note: "Telegram or your mail app will open with the text ready. All that is left is to press Send.",
+      subject: "Task from the portfolio site",
+    },
+  },
+  faq: {
+    title: "Questions people ask",
+    items: [
+      { q: "How long does a project take?", a: "It depends on the task. After a short review I name the timeline and split the work into stages: each stage ends with a working part you can check." },
+      { q: "Do you work with our 1C or BAS?", a: "Yes. I connect to the existing configuration through HTTP services, OData or directly to the database, with no rewriting of your accounting." },
+      { q: "How are data and access protected?", a: "Access is checked by code, not by the model: roles, filtering of available actions, a second check before every call and an audit log." },
+      { q: "You work solo. What if the task is big?", a: "I work solo, with AI tools in development, and review every change myself. I split a big task into stages so the first result appears early, not at the end." },
+      { q: "What happens after launch?", a: "I keep supporting the system: fixes, improvements, new integrations. We agree on the support format before the work starts." },
+    ],
   },
   footer: {
     top: "Back to top",

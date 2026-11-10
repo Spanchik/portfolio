@@ -84,7 +84,13 @@ export function Story({ dict }: { dict: Dictionary }) {
   useEffect(() => {
     let dispose: (() => void) | undefined;
     let cancelled = false;
-    import("./scene")
+    // start the 3D scene once the page is idle, so it does not compete with the first paint
+    const whenIdle = new Promise<void>((resolve) => {
+      if ("requestIdleCallback" in window) window.requestIdleCallback(() => resolve(), { timeout: 1200 });
+      else setTimeout(resolve, 200);
+    });
+    whenIdle
+      .then(() => import("./scene"))
       .then(({ createStory }) => {
         if (cancelled || !canvasRef.current || !labelsRef.current || !flashRef.current || !cursorRef.current || !hintRef.current || !trackRef.current) return;
         try {

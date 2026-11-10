@@ -179,12 +179,12 @@ const OBJECT_ORDER = ["folder", "sheet", "chat", "envelope", "clipboard", "sheet
 
 /** Returns a disposer. Throws if WebGL is unavailable (caller shows a fallback). */
 export function createStory(o: StoryOptions): () => void {
-  const renderer = new THREE.WebGLRenderer({ canvas: o.canvas, antialias: true, alpha: true });
-  // phones: cheaper frame (lower DPR, smaller shadow map, fewer chaos objects)
+  // phones: cheaper frame (no MSAA, lower DPR, smaller and harder shadow map, fewer chaos objects, ~30 fps)
   const lite = window.matchMedia("(max-width: 820px)").matches;
+  const renderer = new THREE.WebGLRenderer({ canvas: o.canvas, antialias: !lite, alpha: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, lite ? 1.5 : 2));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = lite ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -557,6 +557,8 @@ export function createStory(o: StoryOptions): () => void {
 
   const frame = (now: number) => {
     raf = requestAnimationFrame(frame);
+    // phones render every other frame: halves the main-thread and GPU load, the motion still reads smooth
+    if (lite && now - last < 30) return;
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     if (!visible) return;

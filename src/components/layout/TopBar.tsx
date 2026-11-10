@@ -24,6 +24,9 @@ export function TopBar({ lang, dict }: { lang: Locale; dict: Dictionary }) {
             <a href="#about" className={link}>
               {dict.topbar.about}
             </a>
+            <a href="#faq" className={link}>
+              {dict.topbar.faq}
+            </a>
           </nav>
           <a
             href="#contact"
