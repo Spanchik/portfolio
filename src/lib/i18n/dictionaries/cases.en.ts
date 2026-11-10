@@ -64,7 +64,7 @@ export const casesEn: CasesDict = {
         { label: "Sync", value: "20 min" },
         { label: "Errors", value: "0" },
       ],
-      columns: ["Item", "Price", "Stock", "Storefront"],
+      columns: ["Item", "Price", "Stock", "Live"],
       rows: [
         { name: "Milk 2.5% 900 g", price: "42.90", stock: "18" },
         { name: "Rye bread", price: "28.50", stock: "6" },

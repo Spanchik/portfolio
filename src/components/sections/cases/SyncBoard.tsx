@@ -51,9 +51,9 @@ export function SyncBoard({ dict }: { dict: Sync }) {
 
             {/* catalogue */}
             <div className="rounded-xl border-[1.5px] border-ink">
-              <p className="grid grid-cols-[1fr_3.4rem_2.4rem_2.6rem] sm:grid-cols-[1fr_5rem_4.5rem_5rem] gap-2 border-b-[1.5px] border-ink bg-paper px-3 py-2 text-[11.5px] font-semibold tracking-[0.06em] text-ink/65 uppercase">
+              <p className="grid grid-cols-[1fr_4.2rem_3.7rem] gap-2 border-b-[1.5px] border-ink bg-paper px-3 py-2 text-[10.5px] font-semibold text-ink/65 uppercase sm:grid-cols-[1fr_5rem_4.5rem_5rem] sm:text-[11.5px] sm:tracking-[0.06em]">
                 {dict.columns.map((c, i) => (
-                  <span key={c} className={cn("truncate", i > 0 && "text-right")}>
+                  <span key={c} className={cn("truncate", i > 0 && "text-right", i === 1 && "hidden sm:block")}>
                     {c}
                   </span>
                 ))}
@@ -66,12 +66,12 @@ export function SyncBoard({ dict }: { dict: Sync }) {
                   <p
                     key={r.name}
                     className={cn(
-                      "grid grid-cols-[1fr_3.4rem_2.4rem_2.6rem] sm:grid-cols-[1fr_5rem_4.5rem_5rem] items-center gap-2 px-3 py-2 text-[13px]",
+                      "grid grid-cols-[1fr_4.2rem_3.7rem] items-center gap-2 px-3 py-2 text-xs sm:grid-cols-[1fr_5rem_4.5rem_5rem] sm:text-[13px]",
                       i > 0 && "border-t border-ink/15",
                     )}
                   >
                     <b className="truncate font-semibold">{r.name}</b>
-                    <span className="text-right tabular-nums">{r.price}</span>
+                    <span className="hidden text-right tabular-nums sm:block">{r.price}</span>
                     <span className={cn("text-right tabular-nums", !live && "text-ink/45")}>{restock && live ? dict.restock : r.stock}</span>
                     <span className="flex justify-end">
                       <span

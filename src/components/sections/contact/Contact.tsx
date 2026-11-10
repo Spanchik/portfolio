@@ -76,7 +76,7 @@ export function Contact({ dict }: { dict: Dictionary }) {
           <motion.div {...reveal(0.2)} className="flex min-w-0 items-center gap-3">
             <a
               href={`mailto:${email}`}
-              className="group min-w-0 truncate font-display text-[clamp(0.85rem,3vw,2.4rem)] font-bold tracking-[-0.02em] underline decoration-fg/40 decoration-2 underline-offset-[0.18em] hover:decoration-accent"
+              className="group min-w-0 truncate inline-flex min-h-10 items-center font-display text-[clamp(0.85rem,2.7vw,2.4rem)] font-bold tracking-[-0.02em] underline decoration-fg/40 decoration-2 underline-offset-[0.18em] hover:decoration-accent"
             >
               {email}
             </a>
@@ -125,7 +125,7 @@ export function Contact({ dict }: { dict: Dictionary }) {
           {...reveal(0.15)}
           className="mx-auto w-full max-w-[220px] lg:col-span-4 lg:max-w-[340px]"
         >
-          <svg viewBox="-110 -110 220 200" className={reduced ? "w-full" : "w-full animate-[float_6s_ease-in-out_infinite]"}>
+          <svg viewBox="-104 -96 208 195" className={reduced ? "w-full" : "w-full animate-[float_6s_ease-in-out_infinite]"}>
             {CUBES.map((c, i) => (
               <CubeShape key={i} c={c} />
             ))}
