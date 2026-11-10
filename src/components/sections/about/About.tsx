@@ -33,8 +33,8 @@ export function About({ dict, lang }: { dict: Dictionary; lang: "uk" | "en" }) {
       <div className="mx-auto grid max-w-[1360px] grid-cols-1 items-center gap-12 px-4 py-20 md:px-8 md:py-32 lg:grid-cols-12 lg:gap-10">
         <motion.div {...reveal()} className="relative mx-auto w-full max-w-[460px] lg:col-span-5">
           {/* offset "extrusion", echoing the isometric blocks */}
-          <div aria-hidden className="absolute inset-0 translate-x-4 translate-y-4 bg-bg" />
-          <div className="relative aspect-[4/5] overflow-hidden border-[1.5px] border-ink bg-ink">
+          <div aria-hidden className="absolute inset-0 translate-x-4 translate-y-4 rounded-2xl bg-bg" />
+          <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border-[1.5px] border-ink bg-ink">
             {p && (
               <Image
                 src={p.src}
@@ -51,7 +51,7 @@ export function About({ dict, lang }: { dict: Dictionary; lang: "uk" | "en" }) {
           <motion.h2
             {...reveal(0.1)}
             id="about-title"
-            className="font-display text-4xl font-bold tracking-[-0.02em] md:text-6xl"
+            className="font-display text-[clamp(1.9rem,4.1vw,3.75rem)] leading-[1.08] font-bold tracking-[-0.02em]"
           >
             {dict.about.title}
             {name && <span className="block text-bg">{name}</span>}
